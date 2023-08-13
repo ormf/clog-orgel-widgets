@@ -28,7 +28,7 @@ gpl 2.0 or later
 ** Installation
 
    clone the repository into a asdf/quicklisp aware directory (like
-   =~/quicklisp/local-projects=
+   =~/quicklisp/local-projects=)
 
    Then
 
