@@ -1,12 +1,13 @@
 
 * clog-dsp-widgets
 
-This is a project for creating widgets to use for dsp guis in [[https://en.wikipedia.org/wiki/Common_Lisp][Common
-Lisp]], very similar to the widgets found in programs like [[https://en.wikipedia.org/wiki/Pure_Data][Pure Data]],
-[[https://en.wikipedia.org/wiki/SuperCollider][SuperCollider]] or [[https://en.wikipedia.org/wiki/Max_(software)][Max/MSP]].
+This is a project for creating dsp guis in [[https://en.wikipedia.org/wiki/Common_Lisp][Common Lisp]], very similar
+to the widgets found in programs like [[https://en.wikipedia.org/wiki/Pure_Data][Pure Data]], [[https://en.wikipedia.org/wiki/SuperCollider][SuperCollider]] or
+[[https://en.wikipedia.org/wiki/Max_(software)][Max/MSP]].
 
-The widgets are primarily aimed at providing a gui interface for dsp
-in Common Lisp (to interact with with [[https://incudine.sourceforge.net][Incudine]], [[https://github.com/byulparan/cl-collider][cl-collider]], [[https://en.wikipedia.org/wiki/Pure_Data][Pure Data]], etc.)
+The widgets are primarily aimed at providing control surfaces to
+interact with with dsp related realtime software like [[https://incudine.sourceforge.net][Incudine]],
+[[https://github.com/byulparan/cl-collider][cl-collider]], [[https://en.wikipedia.org/wiki/Pure_Data][Pure Data]], etc.
 
 ** License
 
