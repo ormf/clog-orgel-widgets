@@ -12,10 +12,10 @@ surfaces to interact with with dsp related realtime software like
 directly or by using network protocols like [[https://en.wikipedia.org/wiki/Open_Sound_Control][OSC]].
 
 As the surfaces are running on a webbrowser, installation and usage
-requires minimum effort and is usable from a large variety of devices
-like mobile phones, tablets, laptops etc. The project depends on [[https://github.com/rabbibotton/clog][CLOG]]
-by David Botton, which does the heavy lifting to handle the connection
-between Common Lisp and Javascript/CSS/Html5.
+requires minimum effort and tehy are usable from a large variety of
+devices like mobile phones, tablets, laptops etc. The project depends
+on [[https://github.com/rabbibotton/clog][CLOG]] by David Botton, which does the heavy lifting to handle the
+connection between Common Lisp and Javascript/CSS/Html5.
 
 ** License
 
