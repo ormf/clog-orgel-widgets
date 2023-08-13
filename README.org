@@ -1,13 +1,17 @@
 
 * clog-dsp-widgets
 
-This is a project for creating dsp guis in [[https://en.wikipedia.org/wiki/Common_Lisp][Common Lisp]], very similar
-to the widgets found in programs like [[https://en.wikipedia.org/wiki/Pure_Data][Pure Data]], [[https://en.wikipedia.org/wiki/SuperCollider][SuperCollider]] or
-[[https://en.wikipedia.org/wiki/Max_(software)][Max/MSP]].
+This project facilitates creating dsp guis in [[https://en.wikipedia.org/wiki/Common_Lisp][Common Lisp]], very
+similar to the widgets found in programs like [[https://en.wikipedia.org/wiki/Pure_Data][Pure Data]], [[https://en.wikipedia.org/wiki/SuperCollider][SuperCollider]]
+or [[https://en.wikipedia.org/wiki/Max_(software)][Max/MSP]].
 
 The widgets are primarily aimed at providing control surfaces to
 interact with with dsp related realtime software like [[https://incudine.sourceforge.net][Incudine]],
-[[https://github.com/byulparan/cl-collider][cl-collider]], [[https://en.wikipedia.org/wiki/Pure_Data][Pure Data]], etc.
+[[https://github.com/byulparan/cl-collider][cl-collider]], [[https://en.wikipedia.org/wiki/Pure_Data][Pure Data]], etc. controlled within Common Lisp, either
+directly or by using network protocols like [[https://en.wikipedia.org/wiki/Open_Sound_Control][OSC]]. As the surfaces are
+running on a webbrowser installation and usage requires minimum effort
+and is usable from a large variety of devices like mobile phones,
+tablets, laptops etc.
 
 ** License
 
@@ -19,7 +23,7 @@ gpl 2.0 or later
 
 ** Installation
 
-   clone the sources into a asdf/quicklisp aware directory (like
+   clone the repository into a asdf/quicklisp aware directory (like
    =~/quicklisp/local-projects=
 
    Then
