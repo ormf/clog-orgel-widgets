@@ -1,15 +1,38 @@
 
-* cl-orgel-gui
-*** _Orm Finnendahl <orm.finnendahl@selma.hfmdk-frankfurt.de>_
+* clog-dsp-widgets
+*** Orm Finnendahl <orm.finnendahl@selma.hfmdk-frankfurt.de>
 
-This is a project for a browser-based gui for the Papierrohrorgel
-research project. It depends on [[https://github.com/rabbibotton/clog/][CLOG]] by David Botton.
+This is a project for creating widgets to use for dsp guis in [[https://en.wikipedia.org/wiki/Common_Lisp][Common
+Lisp]], very similar to the widgets found in programs like [[https://en.wikipedia.org/wiki/Pure_Data][Pure Data]],
+[[https://en.wikipedia.org/wiki/SuperCollider][SuperCollider]] or [[https://en.wikipedia.org/wiki/Max_(software)][Max/MSP]].
+
+The widgets are primarily aimed at providing a gui interface for dsp
+in Common Lisp (to interact with with [[https://incudine.sourceforge.net][Incudine]], [[https://github.com/byulparan/cl-collider][cl-collider]], [[https://en.wikipedia.org/wiki/Pure_Data][Pure Data]], etc.)
 
 ** License
 
 gpl 2.0 or later
 
+** Dependencies
+    
+    - [[https://github.com/rabbibotton/clog][CLOG]] by David Botton
 
+** Installation
+
+   clone the sources into a asdf/quicklisp aware directory (like
+   =~/quicklisp/local-projects=
+
+   Then
+
+   #+BEGIN_SRC lisp
+     (ql:quickload :clog-dsp-widgets)
+   #+END_SRC
+
+** Example
+
+   Check the file =example/clog-dsp-widgets-example.lisp= for an usage
+   example.
+   
 Copyright (c) 2023 Orm Finnendahl <orm.finnendahl@selma.hfmdk-frankfurt.de>
 
 
