@@ -50,13 +50,14 @@
       ;;   (multi-vslider gui-container :num 16 :css '(:width 160px :margin 5px)
       ;;                                :val-change-cb (lambda (idx val obj)
       ;;                                                 (format t "slider ~a of element ~S changed to ~a~%" idx obj val))))
-      (vslider gui-container :css '(:width 10px :flex "0 0 auto" :margin 10px) :value 70 :background "transparent" :color "transparent" :slider-thumb-height 1
+;;;      (toggle gui-container)
+      (vslider gui-container :css '(:width 10px :flex "0 0 auto" :margin 10px) :value 0.70 :background "transparent" :color "transparent" :slider-thumb-height 1
                              :val-change-cb (lambda (val obj)
                                               (format t "slider element ~S changed to ~a~%" obj val)))
-      (vslider gui-container :css '(:width 10px :flex "0 0 auto" :margin 10px) :value 20 :background "transparent" :color "lightblue")
-      (vslider gui-container :css '(:width 10px :flex "0 0 auto" :margin 10px) :value 50 :background "lightblue")
-      (vslider gui-container :css '(:width 10px :flex "0 0 auto" :margin 10px) :value 10 :background "#555" :thumbcolor "orange")
-      (vslider gui-container :css '(:width 10px :flex "0 0 auto" :margin 10px) :value 90 :background "lightblue" :color "lightgreen" :thumbcolor "red")
+      (vslider gui-container :css '(:width 10px :flex "0 0 auto" :margin 10px) :value 0.2 :background "transparent" :color "lightblue")
+      (vslider gui-container :css '(:width 10px :flex "0 0 auto" :margin 10px) :value 0.50 :background "lightblue")
+      (vslider gui-container :css '(:width 10px :flex "0 0 auto" :margin 10px) :value 0.10 :background "#555" :thumbcolor "orange")
+      (vslider gui-container :css '(:width 10px :flex "0 0 auto" :margin 10px) :value 0.90 :background "lightblue" :color "lightgreen" :thumbcolor "red")
       )))
 
 (defun start-dsp-widgets-example ()

@@ -24,5 +24,6 @@
   (clog-gui-initialize body)
   (load-script (html-document body) "js/vumeter.js")
   (load-script (html-document body) "js/toggle.js")
+  (load-script (html-document body) "js/slider.js")
   (load-css (html-document body) "/css/w3.css")
   (load-css (html-document body) "./css/custom-gui-elems.css"))

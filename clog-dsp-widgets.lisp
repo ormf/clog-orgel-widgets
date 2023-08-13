@@ -64,6 +64,7 @@
              (funcall val-change-cb val hsl)))))
     hsl))
 
+#|
 (defun vslider
     (container &rest args
      &key (value 0.0) (min 0.0) (max 100.0) (thumbcolor "black") (color "transparent")
@@ -100,6 +101,47 @@
 ;;;                                       (format t "vsl~a: ~a~%" (1+ idx) val)
              (funcall val-change-cb val vsl)))))
     vsl))
+|#
+
+(defun vslider
+    (container &rest args
+     &key (value 0.0) (min 0.0) (max 1.0) (thumbcolor "black") (color "transparent")
+       (border-right-width "1px") (background "#fff") (width "10px") (height "100px") (mapping :lin)
+       style val-change-cb
+     &allow-other-keys)
+  "vertical slider including behaviour."
+  (declare (ignorable style val-change-cb))
+  (let* ((css (getf args :css))
+         (vsl (create-div container
+                             :class "vslider"
+                             :css (append
+                                   `(
+                                     :border "thin solid black"
+;;                                     :border-right ,border-right-width
+                                     :background ,background
+                                     :height ,(or (getf css :height) height)
+                                     :width ,(or (getf css :width) width))
+                                   (progn
+                                     (dolist (key '(:height :width)) (remf css key))
+                                     css))
+                             :data-value value
+                             :data-min min
+                             :data-max max
+                             :data-mapping mapping)))
+    (let ((str (format nil "slider(~A, { \"barColor\": '~(~a~)', \"thumbColor\": '~(~a~)', \"minValue\": '~(~a~)', \"maxValue\": '~(~a~)', \"value\": '~(~a~)', \"mapping\": '~(~a~)', \"orientation\": 'vertical'})" (jquery vsl) color thumbcolor min max value mapping)))
+;;;      (break "~S" str)
+      (js-execute vsl str))
+    
+;;     (if val-change-cb
+;;         (set-on-input
+;;          vsl
+;;          (lambda (obj)
+;;            (declare (ignore obj))
+;;            (let ((val (value vsl)))
+;; ;;;                                       (format t "vsl~a: ~a~%" (1+ idx) val)
+;;              (funcall val-change-cb val vsl)))))
+    vsl))
+
 
 (defun multi-vslider (container &rest args
                       &key (num 8) (width 80) (height 100) (background "white") (colors #("blue")) (thumbcolor "transparent") val-change-cb
@@ -224,10 +266,6 @@
                            (setf mouse-dragged nil)))
     elem))
 
-
-
-
-
 (defun toggle (container &key (style "") (content "") (size 6)
                            (color "black")
                            (background "white")
@@ -245,6 +283,7 @@
                                    :data-val "0.0")))
     (let ((str (format nil "toggle(~A, { \"colorOff\": '~(~a~)', \"backgroundOff\": '~(~a~)', \"labelOff\": '~(~a~)', \"valueOff\": '~(~a~)', \"colorOn\": '~(~a~)', \"backgroundOn\": '~(~a~)', \"labelOn\": '~(~a~)', \"valueOn\": '~(~a~)'})"
                             (jquery btn) color background content value-off selected-foreground selected-background toggle-content value-on)))
+;;;      (break "~S" str)
       (js-execute btn str))
     (set-on-click
      btn
@@ -297,7 +336,9 @@
   (when background (setf (getf args :--vu-background) background))
 ;;;  (break (format nil "justify-content: center;~{~(~A~): \"~a\"~^; ~}" args))
   (let ((vu-container (create-div container :class "vumeter" :style (format nil "justify-content: center;background-color: var(--vu-background);~{~(~A~): ~a; ~}~@[~a~]" args style) :data-db data-db)))
-    (js-execute vu-container (format nil "vumeter(~A, {\"boxCount\": 40, \"ledColors\": ~a, \"barColor\": ~a, \"vuType\": '~(~a~)', \"inputMode\": '~(~a~)', \"displayMap\": '~(~a~)', \"direction\": '~(~a~)', \"innerPadding\": '~(~a~)', \"innerPaddingBottom\": '~(~a~)'})"
+    (js-execute vu-container (format nil "vumeter(~A, {\"boxCount\": 40, \"ledColors\": ~a, \"barColor\": ~a, \"vuType\": '~(~a~)',
+                                          \"inputMode\": '~(~a~)', \"displayMap\": '~(~a~)', \"direction\": '~(~a~)',
+                                          \"innerPadding\": '~(~a~)', \"innerPaddingBottom\": '~(~a~)'})"
                                   (jquery vu-container)
                                   (if led-colors (if (symbolp led-colors) (format nil "\"~(~a~)\"" led-colors) (cols->jsarray led-colors)) "false")
                                   bar-color

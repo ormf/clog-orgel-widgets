@@ -13,7 +13,7 @@ directly or by using network protocols like [[https://en.wikipedia.org/wiki/Open
 
 As the surfaces are running on a webbrowser, installation and usage
 requires minimum effort and they are usable from a large variety of
-devices like mobile phones, tablets, laptops etc. The project depends
+devices like mobile phones, tablets, laptops, etc. The project depends
 on [[https://github.com/rabbibotton/clog][CLOG]] by David Botton, which does the heavy lifting to handle the
 connection between Common Lisp and Javascript/CSS/Html5.
 

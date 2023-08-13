@@ -99,15 +99,32 @@ input[type="checkbox"]:checked+label::before {
   padding: 0;
 }
 
-.vslider .hslider {
+.vslider {
     position: relative;
     /* margin-top: 45px; */
     /* margin-bottom: 45px; */
     /* margin-left: -45px; */
     /* margin-right: -45px; */
     /* transform: rotate(270deg); */
+    min-width: 0;
+    background: var(--slider-background);
+    /* flex: "1 1 0" */
     flex: 0 0 auto;
 }
+
+.hslider {
+    position: relative;
+    /* margin-top: 45px; */
+    /* margin-bottom: 45px; */
+    /* margin-left: -45px; */
+    /* margin-right: -45px; */
+    /* transform: rotate(270deg); */
+    min-height: 0
+    background: var(--slider-background);
+    /* flex: "1 1 0" */
+    flex: 0 0 auto;
+}
+
 
 .numbox {
     --textbox-selected-foreground: black;
