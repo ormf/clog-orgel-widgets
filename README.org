@@ -1,6 +1,5 @@
 
 * clog-dsp-widgets
-*** Orm Finnendahl <orm.finnendahl@selma.hfmdk-frankfurt.de>
 
 This is a project for creating widgets to use for dsp guis in [[https://en.wikipedia.org/wiki/Common_Lisp][Common
 Lisp]], very similar to the widgets found in programs like [[https://en.wikipedia.org/wiki/Pure_Data][Pure Data]],
@@ -33,6 +32,4 @@ gpl 2.0 or later
    Check the file =example/clog-dsp-widgets-example.lisp= for an usage
    example.
    
-Copyright (c) 2023 Orm Finnendahl <orm.finnendahl@selma.hfmdk-frankfurt.de>
-
 
