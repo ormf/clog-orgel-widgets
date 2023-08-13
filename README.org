@@ -2,8 +2,9 @@
 * clog-dsp-widgets
 
 This project facilitates creating dsp guis in [[https://en.wikipedia.org/wiki/Common_Lisp][Common Lisp]], by
-providing sliders, numboxes, vu-meters, etc., very similar to the
-widgets found in programs like [[https://en.wikipedia.org/wiki/Pure_Data][Pure Data]], [[https://en.wikipedia.org/wiki/SuperCollider][SuperCollider]] or [[https://en.wikipedia.org/wiki/Max_(software)][Max/MSP]].
+providing sliders, toggles, numboxes, vu-meters, etc., very similar to
+the widgets found in programs like [[https://en.wikipedia.org/wiki/Pure_Data][Pure Data]], [[https://en.wikipedia.org/wiki/SuperCollider][SuperCollider]] or
+[[https://en.wikipedia.org/wiki/Max_(software)][Max/MSP]].
 
 The widgets are primarily aimed at providing elements for control
 surfaces to interact with with dsp related realtime software like
