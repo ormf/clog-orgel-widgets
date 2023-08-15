@@ -149,7 +149,7 @@
                              :data-mapping mapping
                              :data-direction direction)))
     ;;;      (break "~S" str)
-    (js-execute vsl (format nil "slider(~A, { \"barColor\": '~(~a~)', \"thumbColor\": '~(~a~)', \"minValue\": '~(~a~)', \"maxValue\": '~(~a~)', \"value\": '~(~a~)', \"mapping\": '~(~a~)', \"direction\": 'up', \"thumb\": '~a', \"clipZero\": '~a'})" (jquery vsl) (or (getf css :--bar-color) "transparent") (or (getf css :--thumb-color) "black") min max value mapping (if thumb 'true 'false) (if clip-zero 'true 'false)))
+    (js-execute vsl (format nil "slider(~A, { \"thumb\": '~a'})" (jquery vsl) (if thumb 'true 'false)))
     (clog::set-event vsl "valuechange"
                      (lambda (data)
                        (declare (ignore data))

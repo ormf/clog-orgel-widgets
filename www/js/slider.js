@@ -1,14 +1,15 @@
 const valChangeEvent = new Event("valuechange");
 
 function slider(elem, config){
-    var barColor      = config.barColor || 'transparent';
-    var thumbColor    = config.thumbColor || 'black';
+//    var barColor      = config.barColor || 'transparent';
+//    var thumbColor    = config.thumbColor || 'black';
     var thumb         = config.thumb || 'true';
 
 
     var slider = elem.get(0);
     var sliderBar = document.createElement("div");
     slider.appendChild(sliderBar);
+
     
     const pxRegex = /([0-9]+).*/
     var offsetTop = slider.offsetTop;
@@ -27,6 +28,10 @@ function slider(elem, config){
     var valueRatio;
     var calcBarSize;
     var moveListener;
+
+    var style = window.getComputedStyle(slider, null);
+    var thumbColor = style.getPropertyValue('--thumb-color');
+    var barColor = style.getPropertyValue('--bar-color');
     
     function setSliderBarStyle () {
         sliderBar.style.position = 'absolute';
@@ -105,17 +110,14 @@ function slider(elem, config){
         let localXFrac = ((clientX - slider.offsetLeft)) / sliderWidth;
         if (localXFrac < 0) localXFrac = 0;
         if (localXFrac > 1) localXFrac = 1;
-        console.log(localXFrac);
         return localXFrac;
     }
 
     function calcBarHeightRev (YFraction) {
-        console.log('barHeightRev');
         sliderBar.style.height = ((1-YFraction) * (sliderHeight - 1.5)) + 'px';
     }
 
     function calcBarHeight (YFraction) {
-        console.log('barHeight');
         sliderBar.style.height = (YFraction * (sliderHeight - 1.5)) + 'px';
     }
 
@@ -257,7 +259,6 @@ function slider(elem, config){
         let XFraction = getXFraction(event.clientX);
         if (XFraction != oldFraction) {
             let newValue = valFunction(XFraction);
-            console.log('movingX: ' + XFraction);
             calcBarSize(XFraction);
             slider.setAttribute('data-value', newValue);
             slider.dispatchEvent(valChangeEvent);

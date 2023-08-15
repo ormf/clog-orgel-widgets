@@ -1,4 +1,6 @@
 :root {
+    --bar-color: "transparent";
+    --thumb-color: black
     --numbox-select: auto;
     --border-right-width: 0px;
     --slider-color: #3071A9;
@@ -101,15 +103,14 @@ input[type="checkbox"]:checked+label::before {
 
 .vslider {
     position: relative;
-    /* margin-top: 45px; */
-    /* margin-bottom: 45px; */
-    /* margin-left: -45px; */
-    /* margin-right: -45px; */
-    /* transform: rotate(270deg); */
+    background: white;
+    --thumb-color: black;
+    --bar-color: "transparent";
     min-width: 0;
-    /* background: var(--slider-background); */
-    /* flex: "1 1 0" */
     flex: 0 0 auto;
+    width: 17px;
+    height: 144px;
+    border: thin solid black;
 }
 
 .hslider {
