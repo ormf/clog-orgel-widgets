@@ -1,16 +1,20 @@
-const valChangeEvent = new Event("valuechange");
 
 function slider(elem, config){
 //    var barColor      = config.barColor || 'transparent';
 //    var thumbColor    = config.thumbColor || 'black';
     var thumb         = config.thumb || 'true';
 
+    var slider;
+    if (elem.nodeType == undefined)
+        slider = elem.get(0);
+    else
+        slider = elem;
 
-    var slider = elem.get(0);
+
     var sliderBar = document.createElement("div");
     slider.appendChild(sliderBar);
 
-    
+    const valChangeEvent = new Event("valuechange");
     const pxRegex = /([0-9]+).*/
     var offsetTop = slider.offsetTop;
     var offsetLeft = slider.offsetLeft;
@@ -22,7 +26,7 @@ function slider(elem, config){
     var value;
     var mapping;
     var direction;
-    var clipZero;
+    var clipZero = slider.getAttribute('data-clip-zero');
     var valFunction;
     var valueRange;
     var valueRatio;
@@ -35,7 +39,7 @@ function slider(elem, config){
     
     function setSliderBarStyle () {
         sliderBar.style.position = 'absolute';
-        sliderBar.style.background = barColor;
+        sliderBar.style.backgroundColor = barColor;
         sliderBar.style.border = 'none';
         sliderBar.style.borderRadius = 'inherit';
     }
@@ -115,23 +119,24 @@ function slider(elem, config){
     }
 
     function calcBarHeightRev (YFraction) {
-        sliderBar.style.height = ((1-YFraction) * (sliderHeight - 1.5)) + 'px';
+        sliderBar.style.height = ((1-YFraction) * (sliderHeight - thumbWidth)) + 'px';
     }
 
     function calcBarHeight (YFraction) {
-        sliderBar.style.height = (YFraction * (sliderHeight - 1.5)) + 'px';
+        sliderBar.style.height = (YFraction * (sliderHeight - thumbWidth)) + 'px';
     }
 
     function calcBarWidthRev (YFraction) {
-        sliderBar.style.width = ((1-YFraction) * (sliderWidth - 1.5)) + 'px';
+        sliderBar.style.width = ((1-YFraction) * (sliderWidth - thumbWidth)) + 'px';
     }
 
     function calcBarWidth (YFraction) {
-        sliderBar.style.width = (YFraction * (sliderWidth - 1.5)) + 'px';
+        sliderBar.style.width = (YFraction * (sliderWidth - thumbWidth)) + 'px';
     }
 
     function setDirection () {
         direction = slider.getAttribute("data-direction") || 'up';
+        thumbWidth = -0.5; // will get reset below in case thumb == 'true';
         switch (direction) {
         case 'right':
             sliderBar.style.height = '100%';
@@ -141,6 +146,7 @@ function slider(elem, config){
             sliderBar.style.top = '';
             sliderBar.style.bottom = '0px';
             if (thumb == 'true') {
+                thumbWidth = 1.5;
                 sliderBar.style.borderLeft = 'none';
                 sliderBar.style.borderRight = (sliderHeight/41) + 'px solid ' + thumbColor;
                 sliderBar.style.borderTop = 'none';
@@ -159,6 +165,7 @@ function slider(elem, config){
             sliderBar.style.top = '';
             sliderBar.style.bottom = '0px';
             if (thumb == 'true') {
+                thumbWidth = 1.5;
                 sliderBar.style.borderLeft = (sliderHeight/41) + 'px solid ' + thumbColor;
                 sliderBar.style.borderRight = 'none';
                 sliderBar.style.borderTop = 'none';
@@ -177,6 +184,7 @@ function slider(elem, config){
             sliderBar.style.top = '0px';
             sliderBar.style.bottom = '';
             if (thumb == 'true') {
+                thumbWidth = 1.5;
                 sliderBar.style.borderLeft = 'none';
                 sliderBar.style.borderRight = 'none';
                 sliderBar.style.borderTop = 'none';
@@ -195,6 +203,7 @@ function slider(elem, config){
             sliderBar.style.top = '';
             sliderBar.style.bottom = '0px';
             if (thumb == 'true') {
+                thumbWidth = 1.5;
                 sliderBar.style.borderLeft = 'none';
                 sliderBar.style.borderRight = 'none';
                 sliderBar.style.borderTop = (sliderHeight/41) + 'px solid ' + thumbColor;
@@ -255,6 +264,13 @@ function slider(elem, config){
         }
     }
 
+    slider.setBarSize = function (fraction) {
+        let newValue = valFunction(fraction);
+        calcBarSize(fraction);
+        slider.setAttribute('data-value', newValue);
+        return newValue;
+    }
+    
     function moveListenerX (event) {
         moved = true;
         let XFraction = getXFraction(event.clientX);
@@ -267,6 +283,9 @@ function slider(elem, config){
         }
     }
 
+    slider.removeDownListener = function () {
+        slider.removeEventListener('mousedown', downListener);
+    }
     
     function upListener (event){
         document.removeEventListener('mousemove', moveListener);

@@ -78,47 +78,36 @@
              (funcall val-change-cb val hsl)))))
     hsl))
 
-#|
-(defun vslider
-    (container &rest args
-     &key (value 0.0) (min 0.0) (max 100.0) (thumbcolor "black") (color "transparent")
-       (border-right-width 1) (background "#fff") style
-       val-change-cb
-     &allow-other-keys)
-  "vertical slider including behaviour."
-  (let ((vsl
-          (create-form-element
-           container :range
-           :class "vslider"
-           :css (append
-                 `(:--border-right-width ,(addpx border-right-width)
-                   :--slider-thumb ,thumbcolor
-                   :--slider-color ,color
-                   :--slider-background ,background
-                   :min-width 0
-                   :flex "1 1 0"
-                   :height "100%"
-                   :--slider-thumb-height "1pt"
-                   :slider-thumb-width "100%")
-                 (getf args :css))
-           :value (format nil "~a" value)
-           :min (format nil "~a" min)
-           :max (format nil "~a" max)
-           :orient "vertical"
-           :style style)))
-    (if val-change-cb
-        (set-on-input
-         vsl
-         (lambda (obj)
-           (declare (ignore obj))
-           (let ((val (value vsl)))
-;;;                                       (format t "vsl~a: ~a~%" (1+ idx) val)
-             (funcall val-change-cb val vsl)))))
-    vsl))
-|#
-
 (defun read-value (str)
   (read-from-string (cl-ppcre:regex-replace " *\([0-9.]+\).*" str "\\\1")))
+
+(defmacro slider-template (class slider-length slider-width)
+  `(let* ((css (getf args :css))
+          (slider (create-div container
+                              :class ,class
+                              :css (append
+                                    css
+;;; as window.getComputedStyle doesn't seem to work reliably,we
+;;; explicitely set some default values here instead of using the .css
+;;; file.
+                                    (unless (getf css :height) `(:height ,,slider-length))
+                                    (unless (getf css :width) `(:width ,,slider-width))
+                                    (unless (getf css :background) `(:background ,*default-slider-background-color*))
+                                    (unless (getf css :--thumb-color) `(:--thumb-color ,*default-slider-thumb-color*))
+                                    (unless (getf css :--bar-color) `(:--bar-color ,*default-slider-bar-color*)))
+                              :data-value value
+                              :data-clip-zero clip-zero
+                              :data-min min
+                              :data-max max
+                              :data-mapping mapping
+                              :data-direction direction)))
+     (js-execute slider (format nil "slider(~A, { \"thumb\": '~(~a~)'})" (jquery slider) (if thumb "true" "false")))
+     (clog::set-event slider "valuechange"
+                      (lambda (data)
+                        (declare (ignore data))
+                        (let ((val-string (attribute slider "data-value")))
+                          (if val-change-cb (funcall val-change-cb val-string slider)))))
+     slider))
 
 (defun vslider
     (container &rest args
@@ -128,78 +117,53 @@
      &allow-other-keys)
   "vertical slider including behaviour."
   (declare (ignorable style val-change-cb))
+  (slider-template "vslider" *default-vslider-height* *default-vslider-width*))
+
+(defun hslider
+    (container &rest args
+     &key (num 8) (min 0.0) (max 1.0)
+     (thumb t) (clip-zero nil) (direction "right") (mapping :lin)
+       style val-change-cb
+     &allow-other-keys)
+  "vertical slider including behaviour."
+  (declare (ignorable style val-change-cb))
+  (slider-template "hslider" *default-vslider-width* *default-vslider-height*))
+
+(defun multi-slider (container &rest args
+                     &key (num 8) (colors #("blue" "green" "red"))
+                       (min 0) (max 1) (mapping :lin)
+                       (clip-zero nil)
+                       (thumb t)
+                       (direction "up") val-change-cb
+                      &allow-other-keys)
   (let* ((css (getf args :css))
-         (vsl (create-div container
-                             :class "vslider"
-                             :css (append
-                                   css
-                                    ;;; as window.getComputedStyle
-                                    ;;; doesn't seem to work reliably,
-                                    ;;; we explicitely set some
-                                    ;;; default values here instead of
-                                    ;;; using the .css file.
-                                   (unless (getf css :height) `(:height ,*default-vslider-height*))
-                                   (unless (getf css :width) `(:width ,*default-vslider-width*))
-                                   (unless (getf css :background) `(:background ,*default-slider-background-color*))
-                                   (unless (getf css :--thumb-color) `(:--thumb-color ,*default-slider-thumb-color*))
-                                   (unless (getf css :--bar-color) `(:--bar-color ,*default-slider-bar-color*)))
-                             :data-value value
-                             :data-clip-zero clip-zero
-                             :data-min min
-                             :data-max max
-                             :data-mapping mapping
-                             :data-direction direction)))
-    ;;;      (break "~S" str)
-    (js-execute vsl (format nil "slider(~A, { \"thumb\": '~(~a~)'})" (jquery vsl) (if thumb "true" "false")))
-    (clog::set-event vsl "valuechange"
+         (data-colors (format nil "'[~{\"~a\"~^, ~}]'" (coerce (or (getf args :colors) colors) 'list)))
+         (msl (create-div container
+                          :class "multislider"
+                          :css (append
+                                `(:color "transparent"
+                                  :border "none"
+                                  :display "flex"
+                                  :padding "0.5pt")
+                                css
+                                (unless (getf css :background) `(:background-color "transparent"))
+                                (unless (getf css :height) `(:height ,*default-vslider-height*))
+                                (unless (getf css :width) `(:width ,(format nil "~apx" (* num 17)))))
+                          :data-num-sliders num
+                          :data-min min
+                          :data-max max
+                          :data-mapping mapping
+                          :data-clip-zero clip-zero
+                          :data-colors data-colors
+                          :data-direction (or (getf args :direction) direction))))
+    (js-execute msl (format nil "multislider(~A, { \"thumb\": '~(~a~)'})" (jquery msl) (if thumb "true" "false")))
+    
+    (clog::set-event msl "valuechange"
                      (lambda (data)
                        (declare (ignore data))
-                       (let ((val-string (attribute vsl "data-value")))
-                         (if val-change-cb (funcall val-change-cb val-string vsl)))))
-    vsl))
-
-
-(defun multi-vslider (container &rest args
-                      &key (num 8) (width 80) (height 100) (background "white") (colors #("blue")) (thumbcolor "transparent") val-change-cb
-                      &allow-other-keys)
-  (let* ((msl-container (create-div container
-                                    :css (append
-                                          `(:color "transparent"
-                                            :background-color "transparent"
-                                            :border "none"
-                                            :width ,(addpx width)
-                                            :height ,(addpx height)
-                                            :display "flex"
-                                            :padding "0.5pt")
-                                          (getf args :css))))
-         (vsliders (loop
-                     for n below num
-                     with len = (length colors)
-                     collect (vslider
-                              msl-container
-                              :border-right-width (if (< n (1- num)) 0 1)
-                              :background background
-                              :color (aref colors (mod n len))
-                              :thumbcolor thumbcolor))))
-    (loop for vsl in vsliders
-          for idx from 0
-          do (let ((vsl vsl) (idx idx))
-               (set-on-input
-                vsl
-                (lambda (obj)
-                  (declare (ignore obj))
-                  (let ((val (value vsl)))
-                    (if val-change-cb (funcall val-change-cb idx val vsl)))))
-               (set-on-mouse-move
-                vsl
-                (lambda (obj event-data)
-                  (declare (ignore obj))
-                  (when (or (getf event-data :shift-key))
-                    (let ((val (- 100 (getf event-data :y))))
-                      (when val
-                        (setf (value vsl) val)
-                        (if val-change-cb (funcall val-change-cb idx val vsl)))))))))
-    (values vsliders msl-container)))
+                       (let ((val-string (attribute msl "data-value")))
+                         (if val-change-cb (funcall val-change-cb val-string msl)))))
+    msl))
 
 (defun numbox (container &key (color "#3071A9")
                            (background-color "#fff")
@@ -394,4 +358,3 @@
                                   :inner-padding inner-padding
                                   :inner-padding-bottom inner-padding-bottom))))
     (values vus mvu-container)))
-

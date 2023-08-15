@@ -23,7 +23,7 @@
   (:shadowing-import-from #:clog #:rotate)
   (:export #:clog-dsp-widgets-initialize
            #:vslider #:hslider
-           #:multi-vslider
+           #:multi-slider
            #:toggle
            #:numbox
            #:vumeter

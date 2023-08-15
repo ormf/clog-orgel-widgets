@@ -78,13 +78,19 @@ Example:
        (dolist (key (append '(:css :hidden :html-id :auto-place) ,remove)) (remf ,my-args key))
        ,my-args)))
 
+(defun attr-sanitize (args)
+  (loop
+    for (key val) on args by #'cddr
+    append (list key (if (and (vectorp val) (char= (aref val 0) #\')) val (format nil "\"~a\"" val)))))
+
 (defun format-html-tag (tag args &optional content)
   "create a html format string for the create-... functions for a given
 tag name. To enforce a closing tag without innerHtml, supply an empty
 string as content argument."
+;;;  (break "<~A ~{~(~A~)= ~(~a~)~^ ~}>~A</~A>" tag (attr-sanitize args) content tag)
   (if content
-      (format nil "<~A ~{~(~A~)= \"~(~a~)\"~^ ~}>~A</~A>" tag args content tag)
-      (format nil "<~A ~{~(~A~)= \"~(~a~)\"~^ ~}/>" tag args)))
+      (format nil "<~A ~{~(~A~)= ~(~a~)~^ ~}>~A</~A>" tag (attr-sanitize args) content tag)
+      (format nil "<~A ~{~(~A~)= ~(~a~)~^ ~}/>" tag (attr-sanitize args))))
 
 (defmethod create-div ((obj clog:clog-obj) &rest args
                             &key content class style hidden html-id (auto-place t)
