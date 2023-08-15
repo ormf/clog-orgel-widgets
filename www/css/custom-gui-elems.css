@@ -1,6 +1,6 @@
 :root {
     --bar-color: "transparent";
-    --thumb-color: black
+    --thumb-color: black;
     --numbox-select: auto;
     --border-right-width: 0px;
     --slider-color: #3071A9;
@@ -102,8 +102,9 @@ input[type="checkbox"]:checked+label::before {
 }
 
 .vslider {
+    border-radius: 0px;
     position: relative;
-    background: white;
+    background: #fff;
     --thumb-color: black;
     --bar-color: "transparent";
     min-width: 0;

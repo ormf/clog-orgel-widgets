@@ -123,33 +123,34 @@
 (defun vslider
     (container &rest args
      &key (value 0.0) (min 0.0) (max 1.0)
-     (thumb t) (clip-zero nil) (direction "up") (background "#fff") (width "17px") (height "144px") (mapping :lin)
+     (thumb t) (clip-zero nil) (direction "up") (mapping :lin)
        style val-change-cb
      &allow-other-keys)
   "vertical slider including behaviour."
   (declare (ignorable style val-change-cb))
   (let* ((css (getf args :css))
-         (height (or (getf css :height) height))
-         (width (or (getf css :width) width))
          (vsl (create-div container
                              :class "vslider"
                              :css (append
-                                   `(
-                                     :border "thin solid black"
-;;                                     :border-right ,border-right-width
-                                     :background ,background
-                                     :height ,height
-                                     :width ,width)
-                                   (progn
-                                     (dolist (key '(:height :width)) (remf css key))
-                                     css))
+                                   css
+                                    ;;; as window.getComputedStyle
+                                    ;;; doesn't seem to work reliably,
+                                    ;;; we explicitely set some
+                                    ;;; default values here instead of
+                                    ;;; using the .css file.
+                                   (unless (getf css :height) `(:height ,*default-vslider-height*))
+                                   (unless (getf css :width) `(:width ,*default-vslider-width*))
+                                   (unless (getf css :background) `(:background ,*default-slider-background-color*))
+                                   (unless (getf css :--thumb-color) `(:--thumb-color ,*default-slider-thumb-color*))
+                                   (unless (getf css :--bar-color) `(:--bar-color ,*default-slider-bar-color*)))
                              :data-value value
+                             :data-clip-zero clip-zero
                              :data-min min
                              :data-max max
                              :data-mapping mapping
                              :data-direction direction)))
     ;;;      (break "~S" str)
-    (js-execute vsl (format nil "slider(~A, { \"thumb\": '~a'})" (jquery vsl) (if thumb 'true 'false)))
+    (js-execute vsl (format nil "slider(~A, { \"thumb\": '~(~a~)'})" (jquery vsl) (if thumb "true" "false")))
     (clog::set-event vsl "valuechange"
                      (lambda (data)
                        (declare (ignore data))

@@ -37,6 +37,7 @@ function slider(elem, config){
         sliderBar.style.position = 'absolute';
         sliderBar.style.background = barColor;
         sliderBar.style.border = 'none';
+        sliderBar.style.borderRadius = 'inherit';
     }
     
     function setMinMaxMapping() {
@@ -88,11 +89,11 @@ function slider(elem, config){
     }
     
     function setSliderHeightVal () {
-        sliderHeight = parseFloat(slider.style.height.match(pxRegex)[1]);
+        sliderHeight = parseFloat(style.height.match(pxRegex)[1]);
     }
 
     function setSliderWidthVal () {
-        sliderWidth = parseFloat(slider.style.width.match(pxRegex)[1]);
+        sliderWidth = parseFloat(style.width.match(pxRegex)[1]);
     }
     
     function getValFraction (val) {

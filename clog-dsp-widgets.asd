@@ -10,6 +10,7 @@
   :depends-on (#:clog #:uuid)
   :serial t
   :components ((:file "package")
+               (:file "globals")
                (:file "clog-redefs")
                (:file "clog-dsp-widgets")
                (:file "init")))
