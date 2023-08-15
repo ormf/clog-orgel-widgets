@@ -107,7 +107,7 @@ input[type="checkbox"]:checked+label::before {
     /* margin-right: -45px; */
     /* transform: rotate(270deg); */
     min-width: 0;
-    background: var(--slider-background);
+    /* background: var(--slider-background); */
     /* flex: "1 1 0" */
     flex: 0 0 auto;
 }
@@ -120,7 +120,7 @@ input[type="checkbox"]:checked+label::before {
     /* margin-right: -45px; */
     /* transform: rotate(270deg); */
     min-height: 0
-    background: var(--slider-background);
+    /* background: var(--slider-background); */
     /* flex: "1 1 0" */
     flex: 0 0 auto;
 }

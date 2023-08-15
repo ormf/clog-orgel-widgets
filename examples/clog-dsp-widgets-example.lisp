@@ -34,6 +34,8 @@
 
 (in-package :clog-dsp-widgets-example)
 
+(defparameter *my-slider* nil)
+
 (defun on-new-window (body)
   (clog-dsp-widgets-initialize body)
   (setf (title (html-document body)) "Clog DSP Widget Example")
@@ -51,14 +53,31 @@
       ;;                                :val-change-cb (lambda (idx val obj)
       ;;                                                 (format t "slider ~a of element ~S changed to ~a~%" idx obj val))))
 ;;;      (toggle gui-container)
-      (vslider gui-container :css '(:width 10px :flex "0 0 auto" :margin 10px) :value 0.70 :background "transparent" :color "transparent" :slider-thumb-height 1
-                             :val-change-cb (lambda (val obj)
-                                              (format t "slider element ~S changed to ~a~%" obj val)))
-      (vslider gui-container :css '(:width 10px :flex "0 0 auto" :margin 10px) :value 0.2 :background "transparent" :color "lightblue")
-      (vslider gui-container :css '(:width 10px :flex "0 0 auto" :margin 10px) :value 0.50 :background "lightblue")
-      (vslider gui-container :css '(:width 10px :flex "0 0 auto" :margin 10px) :value 0.10 :background "#555" :thumbcolor "orange")
-      (vslider gui-container :css '(:width 10px :flex "0 0 auto" :margin 10px) :value 0.90 :background "lightblue" :color "lightgreen" :thumbcolor "red")
+      (numbox gui-container)
+      (setf *my-slider* (vslider gui-container
+                                 :css '(:height 100px :flex "0 0 auto"
+                                        :margin 10px)
+                                 :value 0.70
+                                 :background "transparent"
+                                 :color "transparent"
+                                 :slider-thumb-height 1
+                                 :val-change-cb (lambda (val obj)
+                                                  (format t "slider element ~S changed to ~a~%" obj val))))
+      (vslider gui-container :css '(:height 100px :flex "0 0 auto" :margin 10px) :value 0.2 :background "transparent" :color "lightblue" :thumb nil :min 0 :max 1 :mapping :log
+                             :clip-zero t)
+      (vslider gui-container :css '(:height 100px :flex "0 0 auto" :margin 10px) :value 0.2 :background "transparent" :color "lightblue" :thumb nil :min 0 :max 1 :mapping :log
+                             :clip-zero t :direction "down")
+      (vslider gui-container :css '(:flex "0 0 auto" :margin 10px) :value 0.50 :background "lightblue")
+      (vslider gui-container :css '(:flex "0 0 auto" :margin 10px) :value 0.10 :background "#555" :thumbcolor "orange")
+      (vslider gui-container :css '(:flex "0 0 auto" :margin 10px) :value 0.90 :background "lightblue" :color "lightgreen" :thumbcolor "red")
+      (vslider gui-container :css '(:flex "0 0 auto" :margin 10px) :value 0.90 :background "lightblue" :color "#555" :thumbcolor "red" :direction "down")
+      (vslider gui-container :css '(:height 17px :width 144px :flex "0 0 auto" :margin 10px) :value 0.2 :background "transparent" :color "lightblue" :thumb nil :min 0 :max 1 :mapping :log
+                             :clip-zero t :direction "right")
+      (vslider gui-container :css '(:height 17px :width 144px :flex "0 0 auto" :margin 10px) :value 0.2 :background "transparent" :color "lightblue" :thumb nil :min 0 :max 1 :mapping :log
+                             :clip-zero t :direction "left")
       )))
+
+
 
 (defun start-dsp-widgets-example ()
   "Start Orgel Gui."

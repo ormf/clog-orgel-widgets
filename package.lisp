@@ -27,4 +27,5 @@
            #:toggle
            #:numbox
            #:vumeter
-           #:multi-vu))
+           #:multi-vu
+           #:get-clog-window))

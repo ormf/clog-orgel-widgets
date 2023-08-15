@@ -20,6 +20,20 @@
 
 (in-package :clog-dsp-widgets)
 
+(defun get-clog-window (elem)
+  (window (gethash
+           "clog-body"
+           (gethash
+            (clog::connection-id elem)
+            clog-connection::*connection-data*))))
+
+(defun get-clog-body (elem)
+  (gethash
+   "clog-body"
+   (gethash
+    (clog::connection-id elem)
+    clog-connection::*connection-data*)))
+
 (defun ensure-string (token)
   (if (stringp token) token (format nil "~S" token)))
 
@@ -103,15 +117,21 @@
     vsl))
 |#
 
+(defun read-value (str)
+  (read-from-string (cl-ppcre:regex-replace " *\([0-9.]+\).*" str "\\\1")))
+
 (defun vslider
     (container &rest args
      &key (value 0.0) (min 0.0) (max 1.0) (thumbcolor "black") (color "transparent")
-       (border-right-width "1px") (background "#fff") (width "10px") (height "100px") (mapping :lin)
+     (thumb t) (clip-zero nil) (direction "up")
+       (border-right-width "thin") (background "#fff") (width "17px") (height "144px") (mapping :lin)
        style val-change-cb
      &allow-other-keys)
   "vertical slider including behaviour."
   (declare (ignorable style val-change-cb))
   (let* ((css (getf args :css))
+         (height (or (getf css :height) height))
+         (width (or (getf css :width) width))
          (vsl (create-div container
                              :class "vslider"
                              :css (append
@@ -119,27 +139,23 @@
                                      :border "thin solid black"
 ;;                                     :border-right ,border-right-width
                                      :background ,background
-                                     :height ,(or (getf css :height) height)
-                                     :width ,(or (getf css :width) width))
+                                     :height ,height
+                                     :width ,width)
                                    (progn
                                      (dolist (key '(:height :width)) (remf css key))
                                      css))
                              :data-value value
                              :data-min min
                              :data-max max
-                             :data-mapping mapping)))
-    (let ((str (format nil "slider(~A, { \"barColor\": '~(~a~)', \"thumbColor\": '~(~a~)', \"minValue\": '~(~a~)', \"maxValue\": '~(~a~)', \"value\": '~(~a~)', \"mapping\": '~(~a~)', \"orientation\": 'vertical'})" (jquery vsl) color thumbcolor min max value mapping)))
-;;;      (break "~S" str)
-      (js-execute vsl str))
-    
-;;     (if val-change-cb
-;;         (set-on-input
-;;          vsl
-;;          (lambda (obj)
-;;            (declare (ignore obj))
-;;            (let ((val (value vsl)))
-;; ;;;                                       (format t "vsl~a: ~a~%" (1+ idx) val)
-;;              (funcall val-change-cb val vsl)))))
+                             :data-mapping mapping
+                             :data-direction direction)))
+    ;;;      (break "~S" str)
+    (js-execute vsl (format nil "slider(~A, { \"barColor\": '~(~a~)', \"thumbColor\": '~(~a~)', \"minValue\": '~(~a~)', \"maxValue\": '~(~a~)', \"value\": '~(~a~)', \"mapping\": '~(~a~)', \"direction\": 'up', \"thumb\": '~a', \"clipZero\": '~a'})" (jquery vsl) color thumbcolor min max value mapping (if thumb 'true 'false) (if clip-zero 'true 'false)))
+    (clog::set-event vsl "valuechange"
+                     (lambda (data)
+                       (declare (ignore data))
+                       (let ((val-string (attribute vsl "data-value")))
+                         (if val-change-cb (funcall val-change-cb val-string vsl)))))
     vsl))
 
 
@@ -228,6 +244,7 @@
           (let ((last-y startpos) (last-val startvalue))
             (lambda (obj event-data)
               (declare (ignore obj))
+              (format t "mouse-move~%")
               (let* ((y (getf event-data :y))
                      (scale (if (getf event-data :shift-key) 0.1 1))
                      (val (+ last-val (* scale (- last-y y)))))
@@ -240,21 +257,22 @@
                     (setf (value elem) val-string)
                     (if val-change-cb (funcall val-change-cb val-string elem)))
                   (setf last-y y last-val val)))))))))
-    (set-on-key-up
-     elem
-     (lambda (obj event)
-       (declare (ignore obj))
-       (when (equal (getf event :key) "Enter")
-         (let ((val (value elem)))
-           (unless (numberp (read-from-string val))
-             (setf val (format nil "~,1f" startvalue)))
-           (setf (value elem) val)
-           (if val-change-cb (funcall val-change-cb val elem)))
-         (blur elem))))
+    ;; (set-on-key-up
+    ;;  elem
+    ;;  (lambda (obj event)
+    ;;    (declare (ignore obj))
+    ;;    (when (equal (getf event :key) "Enter")
+    ;;      (let ((val (value elem)))
+    ;;        (unless (numberp (read-from-string val))
+    ;;          (setf val (format nil "~,1f" startvalue)))
+    ;;        (setf (value elem) val)
+    ;;        (if val-change-cb (funcall val-change-cb val elem)))
+    ;;      (blur elem))))
     (set-on-mouse-up
      elem
      (lambda (obj event-data)
        (declare (ignore event-data))
+       (format t "mouse-up~%")
        (set-on-mouse-move
         obj
         (lambda (obj event-data)
