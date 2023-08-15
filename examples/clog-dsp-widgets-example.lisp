@@ -63,19 +63,18 @@
                                  :slider-thumb-height 1
                                  :val-change-cb (lambda (val obj)
                                                   (format t "slider element ~S changed to ~a~%" obj val))))
-      (vslider gui-container :css '(:height 100px :flex "0 0 auto" :margin 10px) :value 0.2 :background "transparent" :color "lightblue" :thumb nil :min 0 :max 1 :mapping :log
-                             :clip-zero t)
-      (vslider gui-container :css '(:height 100px :flex "0 0 auto" :margin 10px) :value 0.2 :background "transparent" :color "lightblue" :thumb nil :min 0 :max 1 :mapping :log
-                             :clip-zero t :direction "down")
-      (vslider gui-container :css '(:flex "0 0 auto" :margin 10px) :value 0.50 :background "lightblue")
-      (vslider gui-container :css '(:flex "0 0 auto" :margin 10px) :value 0.10 :background "#555" :thumbcolor "orange")
-      (vslider gui-container :css '(:flex "0 0 auto" :margin 10px) :value 0.90 :background "lightblue" :color "lightgreen" :thumbcolor "red")
-      (vslider gui-container :css '(:flex "0 0 auto" :margin 10px) :value 0.90 :background "lightblue" :color "#555" :thumbcolor "red" :direction "down")
-      (vslider gui-container :css '(:height 17px :width 144px :flex "0 0 auto" :margin 10px) :value 0.2 :background "transparent" :color "lightblue" :thumb nil :min 0 :max 1 :mapping :log
-                             :clip-zero t :direction "right")
-      (vslider gui-container :css '(:height 17px :width 144px :flex "0 0 auto" :margin 10px) :value 0.2 :background "transparent" :color "lightblue" :thumb nil :min 0 :max 1 :mapping :log
-                             :clip-zero t :direction "left")
-      )))
+      (vslider gui-container :css '(:height 100px :flex "0 0 auto" :margin 10px :background "transparent" :--bar-color "lightblue")
+                             :value 0.2 :thumb nil :mapping :log :clip-zero t)
+      (vslider gui-container :css '(:height 100px :flex "0 0 auto" :margin 10px :background "transparent" :--bar-color "lightblue")
+                             :value 0.2 :thumb nil :mapping :log :clip-zero t :direction "down")
+      (vslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "lightblue") :value 0.50)
+      (vslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "#555" :--thumb-color "orange") :value 0.10)
+      (vslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "lightblue" :--bar-color "lightgreen" :--thumb-color "red") :value 0.90)
+      (vslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "lightblue" :--bar-color "#555" :--thumb-color "red") :value 0.90 :direction "down")
+      (vslider gui-container :css '(:height 17px :width 144px :flex "0 0 auto" :margin 10px :background "transparent" :--bar-color "lightblue")
+                             :value 0.2 :thumb nil :mapping :log :clip-zero t :direction "right")
+      (vslider gui-container :css '(:height 17px :width 144px :flex "0 0 auto" :margin 10px :background "transparent" :--bar-color "lightblue")
+                             :value 0.2 :thumb nil :mapping :log :clip-zero t :direction "left"))))
 
 
 

@@ -122,9 +122,8 @@
 
 (defun vslider
     (container &rest args
-     &key (value 0.0) (min 0.0) (max 1.0) (thumbcolor "black") (color "transparent")
-     (thumb t) (clip-zero nil) (direction "up")
-       (border-right-width "thin") (background "#fff") (width "17px") (height "144px") (mapping :lin)
+     &key (value 0.0) (min 0.0) (max 1.0)
+     (thumb t) (clip-zero nil) (direction "up") (background "#fff") (width "17px") (height "144px") (mapping :lin)
        style val-change-cb
      &allow-other-keys)
   "vertical slider including behaviour."
@@ -150,7 +149,7 @@
                              :data-mapping mapping
                              :data-direction direction)))
     ;;;      (break "~S" str)
-    (js-execute vsl (format nil "slider(~A, { \"barColor\": '~(~a~)', \"thumbColor\": '~(~a~)', \"minValue\": '~(~a~)', \"maxValue\": '~(~a~)', \"value\": '~(~a~)', \"mapping\": '~(~a~)', \"direction\": 'up', \"thumb\": '~a', \"clipZero\": '~a'})" (jquery vsl) color thumbcolor min max value mapping (if thumb 'true 'false) (if clip-zero 'true 'false)))
+    (js-execute vsl (format nil "slider(~A, { \"barColor\": '~(~a~)', \"thumbColor\": '~(~a~)', \"minValue\": '~(~a~)', \"maxValue\": '~(~a~)', \"value\": '~(~a~)', \"mapping\": '~(~a~)', \"direction\": 'up', \"thumb\": '~a', \"clipZero\": '~a'})" (jquery vsl) (or (getf css :--bar-color) "transparent") (or (getf css :--thumb-color) "black") min max value mapping (if thumb 'true 'false) (if clip-zero 'true 'false)))
     (clog::set-event vsl "valuechange"
                      (lambda (data)
                        (declare (ignore data))
