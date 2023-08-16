@@ -20,7 +20,7 @@ function slider(elem, config){
     var offsetLeft = slider.offsetLeft;
     var sliderHeight;
     var sliderWidth;
-    var colors = [];
+    var colors;
     var minValue;
     var maxValue;
     var value;
@@ -28,15 +28,21 @@ function slider(elem, config){
     var direction;
     var clipZero = slider.getAttribute('data-clip-zero');
     var valFunction;
+    var valFunctionRev;
     var valueRange;
     var valueRatio;
+    var valueLogRatio;
     var calcBarSize;
-    var moveListener;
+    var mouseMoveListener;
 
     var style = window.getComputedStyle(slider, null);
     var thumbColor = style.getPropertyValue('--thumb-color');
     var barColor = style.getPropertyValue('--bar-color');
-    
+
+    function clamp(number, min, max) {
+        return Math.max(min, Math.min(number, max));
+    }
+
     function setSliderBarStyle () {
         sliderBar.style.position = 'absolute';
         sliderBar.style.backgroundColor = barColor;
@@ -44,7 +50,7 @@ function slider(elem, config){
         sliderBar.style.borderRadius = 'inherit';
     }
     
-    function setMinMaxMapping() {
+    function setMinMaxMapping () {
         minValue      = parseFloat(slider.getAttribute("data-min")) || 0.0;
         maxValue      = parseFloat(slider.getAttribute("data-max")) || 1.0;
         mapping       = slider.getAttribute("data-mapping") || 'lin';
@@ -68,36 +74,24 @@ function slider(elem, config){
                 }
             }
             valueRatio = maxValue/minValue;
+            valueLogRatio = Math.log(valueRatio);
+            valFunction = logVal;
+            valFunctionRev = logValRev;
         }
-        else {
+        else { // linear mapping
             valueRange = maxValue-minValue;
+            valFunction = linVal;
+            valFunctionRev = linValRev;
         }
         setSliderValue();
         setDirection();
     }
-
-    function setSliderValue () {
-        value = parseFloat(slider.getAttribute("data-value")) || 0.0;
-        if (maxValue > minValue) {
-            if (value < minValue) { value = minvalue }
-            else {
-                if (value > maxValue) { value = maxvalue }
-            }
-        }
-        else {
-            if (value > minValue) { value = minvalue }
-            else {
-                if (value < maxValue) { value = maxvalue }
-            }
-        }
-    }
     
-    function setSliderHeightVal () {
-        sliderHeight = parseFloat(style.height.match(pxRegex)[1]);
-    }
-
-    function setSliderWidthVal () {
-        sliderWidth = parseFloat(style.width.match(pxRegex)[1]);
+    function setSliderValue () {
+        if (maxValue >= minValue)
+            value = clamp(parseFloat((slider.getAttribute("data-value")) || 0.0 ), minValue, maxValue);
+        else
+            value = clamp(parseFloat((slider.getAttribute("data-value")) || 0.0 ), maxValue, minValue);
     }
     
     function getValFraction (val) {
@@ -106,37 +100,33 @@ function slider(elem, config){
 
     function getYFraction (clientY) {
         let localYFrac = (sliderHeight + slider.offsetTop - clientY) / sliderHeight;
-        if (localYFrac < 0) localYFrac = 0;
-        if (localYFrac > 1) localYFrac = 1;
-        return localYFrac;
+        return clamp(localYFrac, 0, 1);
     }
 
     function getXFraction (clientX) {
         let localXFrac = ((clientX - slider.offsetLeft)) / sliderWidth;
-        if (localXFrac < 0) localXFrac = 0;
-        if (localXFrac > 1) localXFrac = 1;
-        return localXFrac;
-    }
-
-    function calcBarHeightRev (YFraction) {
-        sliderBar.style.height = ((1-YFraction) * (sliderHeight - thumbWidth)) + 'px';
+        return clamp(localXFrac, 0, 1);
     }
 
     function calcBarHeight (YFraction) {
         sliderBar.style.height = (YFraction * (sliderHeight - thumbWidth)) + 'px';
     }
 
-    function calcBarWidthRev (YFraction) {
-        sliderBar.style.width = ((1-YFraction) * (sliderWidth - thumbWidth)) + 'px';
+    function calcBarHeightRev (YFraction) {
+        sliderBar.style.height = ((1 - YFraction) * (sliderHeight - thumbWidth)) + 'px';
     }
 
     function calcBarWidth (YFraction) {
         sliderBar.style.width = (YFraction * (sliderWidth - thumbWidth)) + 'px';
     }
 
+    function calcBarWidthRev (YFraction) {
+        sliderBar.style.width = ((1 - YFraction) * (sliderWidth - thumbWidth)) + 'px';
+    }
+
     function setDirection () {
         direction = slider.getAttribute("data-direction") || 'up';
-        thumbWidth = -0.5; // will get reset below in case thumb == 'true';
+        thumbWidth = 0.5; // will get reset below in case thumb == 'true';
         switch (direction) {
         case 'right':
             sliderBar.style.height = '100%';
@@ -152,10 +142,8 @@ function slider(elem, config){
                 sliderBar.style.borderTop = 'none';
                 sliderBar.style.borderBottom = 'none';
             }
-            if (mapping == 'lin') valFunction = linVal;
-            else valFunction = logVal;
             calcBarSize = calcBarWidth;
-            moveListener = moveListenerX;
+            mouseMoveListener = mouseMoveListenerX;
             break;
         case 'left':
             sliderBar.style.height = '100%';
@@ -171,10 +159,8 @@ function slider(elem, config){
                 sliderBar.style.borderTop = 'none';
                 sliderBar.style.borderBottom = 'none';
             }
-            if (mapping == 'lin') valFunction = linValRev;
-            else valFunction = logValRev;
             calcBarSize = calcBarWidthRev;
-            moveListener = moveListenerX;
+            mouseMoveListener = mouseMoveListenerX;
             break;
         case 'down':
             sliderBar.style.width = '100%';
@@ -190,10 +176,8 @@ function slider(elem, config){
                 sliderBar.style.borderTop = 'none';
                 sliderBar.style.borderBottom = (sliderHeight/41) + 'px solid ' + thumbColor;
             }
-            if (mapping == 'lin') valFunction = linValRev;
-            else valFunction = logValRev;
             calcBarSize = calcBarHeightRev;
-            moveListener = moveListenerY;
+            mouseMoveListener = mouseMoveListenerY;
             break;
         default: // 'up'
             sliderBar.style.width = '100%';
@@ -209,50 +193,48 @@ function slider(elem, config){
                 sliderBar.style.borderTop = (sliderHeight/41) + 'px solid ' + thumbColor;
                 sliderBar.style.borderBottom = 'none';
             }
-            if (mapping == 'lin') valFunction = linVal;
-            else valFunction = logVal;
             calcBarSize = calcBarHeight;
-            moveListener = moveListenerY;
+            mouseMoveListener = mouseMoveListenerY;
         }
     }
 
     var moved = false;
     var oldFraction = -1;
     
-    function downListener (event) {
+    function mouseDownListener (event) {
         moved = false;
-        moveListener(event);
-        document.addEventListener('mousemove', moveListener);
-        document.addEventListener('mouseup', upListener);
+        mouseMoveListener(event);
+        document.addEventListener('mousemove', mouseMoveListener);
+        document.addEventListener('mouseup', mouseUpListener);
     }
 
-    function linVal (Frac) {
-        return (minValue + (Frac * valueRange));
+    function linVal (frac) {
+        return (minValue + (frac * valueRange));
     }
 
-    function logVal (Frac) {
-        if ((Frac == 0) && (clipZero == 'true')) {
+    function logVal (frac) {
+        if ((frac == 0) && (clipZero == 'true')) {
             return 0;
         }
         else {
-            return (minValue * Math.pow(valueRatio, Frac));
+            return (minValue * Math.pow(valueRatio, frac));
         }
     }
 
-    function linValRev (Frac) {
-        return (minValue + ((1 - Frac) * valueRange));
+    function linValRev (val) {
+        return (minValue + ((1 - frac) * valueRange));
     }
 
-    function logValRev (Frac) {
-        if ((Frac == 0) && (clipZero == 'true')) {
+    function logValRev (val) {
+        if ((frac == 0) && (clipZero == 'true')) {
             return 0;
         }
         else {
-            return (minValue * Math.pow(valueRatio, (1-Frac)));
+            return (minValue * Math.pow(valueRatio, (1-frac)));
         }
     }
 
-    function moveListenerY (event) {
+    function mouseMoveListenerY (event) {
         moved = true;
         let YFraction = getYFraction(event.clientY);
         if (YFraction != oldFraction) {
@@ -271,7 +253,7 @@ function slider(elem, config){
         return newValue;
     }
     
-    function moveListenerX (event) {
+    function mouseMoveListenerX (event) {
         moved = true;
         let XFraction = getXFraction(event.clientX);
         if (XFraction != oldFraction) {
@@ -283,22 +265,28 @@ function slider(elem, config){
         }
     }
 
-    slider.removeDownListener = function () {
-        slider.removeEventListener('mousedown', downListener);
+    function mouseUpListener (event){
+        document.removeEventListener('mousemove', mouseMoveListener);
+        document.removeEventListener('mouseup', mouseUpListener);
     }
-    
-    function upListener (event){
-        document.removeEventListener('mousemove', moveListener);
-        document.removeEventListener('mouseup', upListener);
+
+    slider.removeMouseDownListener = function () {
+        slider.removeEventListener('mousedown', mouseDownListener);
     }
+
+    slider.dispatchValChangeEvent = function () {
+//        console.log('value changed');
+        slider.dispatchEvent(valChangeEvent);
+    }
+
 
     function initSlider () {
         setSliderBarStyle();
         clipZero = slider.getAttribute("data-clip-zero") || 'false';
-        setSliderHeightVal();
-        setSliderWidthVal();
+        sliderHeight = parseFloat(style.height.match(pxRegex)[1]);
+        sliderWidth = parseFloat(style.width.match(pxRegex)[1]);
         setMinMaxMapping(sliderBar);
-        slider.addEventListener('mousedown', downListener)
+        slider.addEventListener('mousedown', mouseDownListener)
     }
 
     initSlider();

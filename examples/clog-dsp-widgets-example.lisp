@@ -53,7 +53,7 @@
       ;;                                :val-change-cb (lambda (idx val obj)
       ;;                                                 (format t "slider ~a of element ~S changed to ~a~%" idx obj val))))
 ;;;      (toggle gui-container)
-      (numbox gui-container)
+;;;      (numbox gui-container)
       ;; (vslider gui-container
       ;;          :css '(:height 100px :flex "0 0 auto"
       ;;                 :margin 10px)
@@ -76,15 +76,18 @@
       ;;                        :value 0.2 :thumb nil :mapping :log :clip-zero t)
       ;; (hslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "transparent" :--bar-color "lightblue")
       ;;                        :value 0.2 :thumb nil :mapping :log :clip-zero t :direction "left")
-      (multi-slider gui-container :css '(:margin 10px :width 144px :height 144px) :num 16)
-      (multi-slider gui-container :direction "right" :css `(:margin 10px :width 144px :height 144px) :num 16)
-      (multi-slider gui-container :direction "down" :css `(:margin 10px  :width 144px :height 144px) :num 16)
-      (multi-slider gui-container :direction "left" :css `(:margin 10px :width 144px :height 144px) :num 16)
+      ;; (setf *my-slider* (multiple-value-list
+      ;;                    (multi-slider gui-container :css '(:background "transparent" :margin 10px :width 144px :height 144px) :num 8
+      ;;                                                :val-change-cb (lambda (idx val obj) (format t "valueChanged: ~a ~a ~a~%"
+      ;;                                                                                        idx val obj)))))
+      ;; (multi-slider gui-container :direction "right" :css `(:margin 10px :width 144px :height 144px) :num 16)
+      ;; (multi-slider gui-container :direction "down" :css `(:margin 10px  :width 144px :height 144px) :num 16)
+      ;; (multi-slider gui-container :direction "left" :css `(:margin 10px :width 144px :height 144px) :num 16)
       
 
       )))
 
-
+;;; *my-slider*
 
 (defun start-dsp-widgets-example ()
   "Start Orgel Gui."

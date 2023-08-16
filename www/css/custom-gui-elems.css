@@ -117,22 +117,20 @@ input[type="checkbox"]:checked+label::before {
 .mvslider {
     border-radius: 0px;
     position: relative;
-    background: #fff;
     --thumb-color: black;
     --bar-color: "transparent";
     min-width: 0;
-    flex: 0 0 auto;
+    flex: 1 0 auto;
     border: thin solid black;
 }
 
 .mhslider {
     border-radius: 0px;
     position: relative;
-    background: #fff;
     --thumb-color: black;
     --bar-color: "transparent";
     min-width: 0;
-    flex: 0 0 auto;
+    flex: 1 0 auto;
     border: thin solid black;
 }
 
@@ -141,7 +139,7 @@ input[type="checkbox"]:checked+label::before {
     height: 17px;
     border-radius: 0px;
     position: relative;
-    background: #fff;
+    background-color: #fff;
     --thumb-color: black;
     --bar-color: "transparent";
     min-height: 0;

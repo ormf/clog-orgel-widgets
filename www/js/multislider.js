@@ -37,8 +37,7 @@ function multislider(elem, config){
     var getXFrac;
     var getYFrac;
     
-    function makeSlider () {
-        let div = document.createElement("div");
+    function makeSlider (div) {
         div.setAttribute('class', sliderType);
         div.setAttribute('style', 'border: 1px solid black;flex: 1 0 auto;');
         div.style.setProperty(innerBorder, 'none');
@@ -55,15 +54,17 @@ function multislider(elem, config){
 //        div.setAttribute('', '');
         return div;
     }
-    
+
     function createSliders (num, parent) {
-        let sliders = [];
+        let sliders = new Array(num);
         let tmp;
+        let idx;
         for (let i = 0; i < num; i++) {
-            tmp = makeSlider(parent);
-            tmp.style.setProperty("--bar-color", colors[i%numColors]);
-            parent.appendChild(tmp);
-            sliders.push(tmp);
+            tmp = makeSlider(parent.children[i]);
+            //            parent.appendChild(tmp);
+            idx = tmp.getAttribute('data-idx');
+            tmp.style.setProperty("--bar-color", colors[idx%numColors]);
+            sliders[idx] = tmp;
             slider(tmp, { thumb: 'nil' });
             tmp.removeDownListener();
         }
@@ -258,6 +259,7 @@ function multislider(elem, config){
 //            multislider.setAttribute('data-value', newValue);
 //            multislider.dispatchEvent(valChangeEvent);
             sliders[idx].setBarSize(newValue);
+            sliders[idx].dispatchValChangeEvent();
             oldYFraction = YFraction;
             oldXFraction = XFraction;
             lastValue = newValue;
@@ -278,6 +280,7 @@ function multislider(elem, config){
 //            multislider.setAttribute('data-value', newValue);
 //            multislider.dispatchEvent(valChangeEvent);
             sliders[idx].setBarSize(newValue);
+            sliders[idx].dispatchValChangeEvent();
             oldYFraction = YFraction;
             oldXFraction = XFraction;
             lastValue = newValue;

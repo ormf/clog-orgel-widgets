@@ -50,6 +50,7 @@
   "transform a list of hex value colors into a javascript string"
   (format nil "[~{'rgba(~{~a~^, ~}, 1.0)'~^, ~}]" (mapcar #'hex->rgb cols)))
 
+#|
 (defun hslider
     (container &key (value 0.0) (min 0.0) (max 100.0) (thumbcolor "black") (color "#3071A9")
                  (border-right-width 1) (background "#fff") width height
@@ -77,6 +78,7 @@
 ;;;                                       (format t "vsl~a: ~a~%" (1+ idx) val)
              (funcall val-change-cb val hsl)))))
     hsl))
+|#
 
 (defun read-value (str)
   (read-from-string (cl-ppcre:regex-replace " *\([0-9.]+\).*" str "\\\1")))
@@ -90,8 +92,8 @@
 ;;; as window.getComputedStyle doesn't seem to work reliably,we
 ;;; explicitely set some default values here instead of using the .css
 ;;; file.
-                                    (unless (getf css :height) `(:height ,,slider-length))
-                                    (unless (getf css :width) `(:width ,,slider-width))
+                                    (unless (getf css :height) (if ,slider-length `(:height ,,slider-length)))
+                                    (unless (getf css :width) (if ,slider-width `(:width ,,slider-width)))
                                     (unless (getf css :background) `(:background ,*default-slider-background-color*))
                                     (unless (getf css :--thumb-color) `(:--thumb-color ,*default-slider-thumb-color*))
                                     (unless (getf css :--bar-color) `(:--bar-color ,*default-slider-bar-color*)))
@@ -101,6 +103,7 @@
                               :data-max max
                               :data-mapping mapping
                               :data-direction direction)))
+;;;     (break "~S" css)
      (js-execute slider (format nil "slider(~A, { \"thumb\": '~(~a~)'})" (jquery slider) (if thumb "true" "false")))
      (clog::set-event slider "valuechange"
                       (lambda (data)
@@ -121,13 +124,26 @@
 
 (defun hslider
     (container &rest args
-     &key (num 8) (min 0.0) (max 1.0)
+     &key (value 0.0) (min 0.0) (max 1.0)
      (thumb t) (clip-zero nil) (direction "right") (mapping :lin)
        style val-change-cb
      &allow-other-keys)
   "vertical slider including behaviour."
   (declare (ignorable style val-change-cb))
   (slider-template "hslider" *default-vslider-width* *default-vslider-height*))
+
+(defun mslider
+    (container &rest args
+     &key (value 0.0) (min 0.0) (max 1.0)
+     (thumb t) (clip-zero nil) (direction "right") (mapping :lin)
+       style val-change-cb
+     &allow-other-keys)
+  "vertical slider including behaviour."
+  (declare (ignorable style val-change-cb))
+  (let ((slider-class (getf args :slider-class)))
+    (remf args :sliderclass)
+    (slider-template slider-class nil nil)))
+
 
 (defun multi-slider (container &rest args
                      &key (num 8) (colors #("blue" "green" "red"))
@@ -146,7 +162,7 @@
                                   :display "flex"
                                   :padding "0.5pt")
                                 css
-                                (unless (getf css :background) `(:background-color "transparent"))
+                                '(:background-color "transparent")
                                 (unless (getf css :height) `(:height ,*default-vslider-height*))
                                 (unless (getf css :width) `(:width ,(format nil "~apx" (* num 17)))))
                           :data-num-sliders num
@@ -155,15 +171,31 @@
                           :data-mapping mapping
                           :data-clip-zero clip-zero
                           :data-colors data-colors
-                          :data-direction (or (getf args :direction) direction))))
+                          :data-direction (or (getf args :direction) direction)))
+         ;; (subclass (if (member direction '("up" "down") :test #'string=) "mvslider" "mhslider"))
+         ;; (inner-border (if (member direction '("up" "down") :test #'string=) :border-left :border-top))
+         (sliders (let ((res (make-array num))
+                        ;; (colorlen (length colors))
+                        )
+                    (dotimes (i num)
+                      (setf (aref res i)
+                            (create-div msl :data-idx i)))
+                    res)))
     (js-execute msl (format nil "multislider(~A, { \"thumb\": '~(~a~)'})" (jquery msl) (if thumb "true" "false")))
-    
-    (clog::set-event msl "valuechange"
-                     (lambda (data)
-                       (declare (ignore data))
-                       (let ((val-string (attribute msl "data-value")))
-                         (if val-change-cb (funcall val-change-cb val-string msl)))))
-    msl))
+    (dotimes (i num)
+      (let ((slider (aref sliders i)))
+        (clog::set-event slider "valuechange"
+                         (let ((i i))
+                           (lambda (data)
+                             (declare (ignore data))
+                             (let ((val-string (attribute slider "data-value")))
+                               (if val-change-cb (funcall val-change-cb i val-string slider))))))))
+    (values msl sliders)))
+
+(let ((direction "up"))
+  (cond 
+    ((member direction '("up" "down") :test #'string=) 'up)
+    (t nil)))
 
 (defun numbox (container &key (color "#3071A9")
                            (background-color "#fff")
@@ -336,7 +368,7 @@
                                   bar-color
                                   (jquery vu-container)
                                   vu-type input-mode display-map))
-|#
+
 
 (defun multi-vu (container &key (num 8) (width 80) (height 100) background (direction :up) (border "")
                            (inner-background "var(--vu-background)") (inner-border "") inner-padding inner-padding-bottom
@@ -358,3 +390,4 @@
                                   :inner-padding inner-padding
                                   :inner-padding-bottom inner-padding-bottom))))
     (values vus mvu-container)))
+|#
