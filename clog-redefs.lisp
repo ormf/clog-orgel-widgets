@@ -75,6 +75,7 @@ Example:
        (when (or style css)
          (setf (getf ,my-args :style)
                (format nil "~@[~{~(~A~): ~(~a~);~}~]~@[~a~]" css style)))
+       (setf (getf args :draggable) (or (getf args :draggable) "false"))
        (dolist (key (append '(:css :hidden :html-id :auto-place) ,remove)) (remf ,my-args key))
        ,my-args)))
 

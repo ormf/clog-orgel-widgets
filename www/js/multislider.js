@@ -29,7 +29,17 @@ function multislider(elem, config) {
         return Math.max(min, Math.min(number, max));
     }
 
+    function nullFunc () {
+        return false;
+    }
+
+    function disableDrag (elem) {
+        elem.ondragstart = () => { return false; }
+    }
+    
+    
     function makeSlider (div) {
+        div.setAttribute('class', sliderType);
         div.setAttribute('class', sliderType);
         div.setAttribute('style', 'border: 1px solid black;flex: 1 0 auto;');
         div.style.setProperty(innerBorder, 'none');
@@ -256,6 +266,7 @@ function multislider(elem, config) {
     }
 
     function init () {
+        disableDrag(multislider);
         setSliderHeightVal();
         setSliderWidthVal();
         setMinMaxMapping();

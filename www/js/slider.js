@@ -9,9 +9,15 @@ function slider(elem, config){
     else
         slider = elem;
 
+    function disableDrag (elem) {
+        elem.ondragstart = () => { return false; }
+    }
 
     var sliderBar = document.createElement("div");
     slider.appendChild(sliderBar);
+
+    disableDrag(slider);
+    disableDrag(sliderBar);
 
     const valChangeEvent = new Event("valuechange");
     const pxRegex = /([0-9]+).*/
