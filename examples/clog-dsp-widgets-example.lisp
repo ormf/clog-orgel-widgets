@@ -88,9 +88,9 @@
                          (multi-slider gui-container :css '(:background "transparent" :margin 10px :width 144px :height 144px) :num 8
                                                      :val-change-cb (lambda (idx val obj) (format t "valueChanged: ~a ~a ~a~%"
                                                                                              idx val obj)))))
-      ;; (multi-slider gui-container :direction "right" :css `(:margin 10px :width 144px :height 144px) :num 16)
-      ;; (multi-slider gui-container :direction "down" :css `(:margin 10px  :width 144px :height 144px) :num 16)
-      ;; (multi-slider gui-container :direction "left" :css `(:margin 10px :width 144px :height 144px) :num 16)
+      (multi-slider gui-container :direction "right" :css `(:margin 10px :width 144px :height 144px) :num 16)
+      (multi-slider gui-container :direction "down" :css `(:margin 10px  :width 144px :height 144px) :num 16)
+      (multi-slider gui-container :direction "left" :css `(:margin 10px :width 144px :height 144px) :num 16)
       
 
       )))

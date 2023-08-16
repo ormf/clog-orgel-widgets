@@ -1,42 +1,34 @@
-function multislider(elem, config){
-//    var barColor      = config.barColor || 'transparent';
-//    var thumbColor    = config.thumbColor || 'black';
+function multislider(elem, config) {
     var thumb         = config.thumb || 'true';
-
+    const pxRegex = /([0-9]+).*/
 
     var multislider = elem.get(0);
-    // var multisliderBar = document.createElement("div");
-    // multislider.appendChild(sliderBar);
-
     var numSliders = multislider.getAttribute('data-num-sliders');
-//    console.log('numSliders: ', numSliders);
+    var colors = JSON.parse(multislider.getAttribute('data-colors'));
+    var numColors = colors.length;
     
-    const pxRegex = /([0-9]+).*/
     var offsetTop = multislider.offsetTop;
     var offsetLeft = multislider.offsetLeft;
     var multisliderHeight;
     var multisliderWidth;
-//    console.log('colors: ' + multislider.getAttribute('data-colors'));
-    var colors = JSON.parse(multislider.getAttribute('data-colors'));
-//    console.log('colors: ' + colors[1]);
-    var numColors = colors.length;
     var minValue;
     var maxValue;
     var value;
     var mapping;
     var direction;
     var clipZero = multislider.getAttribute('data-clip-zero');
-    var valFunction;
-    var valueRange;
-    var valueRatio;
-    var calcBarSize;
-    var moveListener;
+    var mouseDownListener;
+    var mouseMoveListener;
     var innerBorder;
     var sliders;
     var sliderType;
     var getXFrac;
     var getYFrac;
     
+    function clamp(number, min, max) {
+        return Math.max(min, Math.min(number, max));
+    }
+
     function makeSlider (div) {
         div.setAttribute('class', sliderType);
         div.setAttribute('style', 'border: 1px solid black;flex: 1 0 auto;');
@@ -111,6 +103,8 @@ function multislider(elem, config){
     function setSliderWidthVal () {
         multisliderWidth = parseFloat(style.width.match(pxRegex)[1]);
     }
+
+    // Utils
     
     function getValFraction (val) {
         return ((val - minValue) / valueRange);
@@ -118,33 +112,22 @@ function multislider(elem, config){
 
     function getYFraction (clientY) {
         let localYFrac = (multisliderHeight + multislider.offsetTop - clientY) / multisliderHeight;
-        if (localYFrac < 0) localYFrac = 0;
-        if (localYFrac > 1) localYFrac = 1;
-        return localYFrac;
+        return clamp(localYFrac, 0, 1);
+    }
+
+    function getXFraction (clientX) {
+        let localXFrac = ((clientX - multislider.offsetLeft)) / multisliderWidth;
+        return clamp(localXFrac, 0, 1);
     }
 
     function getYFractionRev (clientY) {
-        let localYFrac = (1 - ((multisliderHeight + multislider.offsetTop - clientY) / multisliderHeight));
-        if (localYFrac < 0) localYFrac = 0;
-        if (localYFrac > 1) localYFrac = 1;
-        return localYFrac;
+        let localYFrac = (1 - (multisliderHeight + multislider.offsetTop - clientY) / multisliderHeight);
+        return clamp(localYFrac, 0, 1);
     }
 
-    
-    function getXFraction (clientX) {
-        let localXFrac = ((clientX - multislider.offsetLeft)) / multisliderWidth;
-//        console.log(clientX + ' ' + multisliderWidth  + ' ' + multislider.offsetLeft + ' ' + localXFrac);
-        if (localXFrac < 0) localXFrac = 0;
-        if (localXFrac > 1) localXFrac = 1;
-        return localXFrac;
-    }
-
-        function getXFractionRev (clientX) {
-            let localXFrac = (1 - ((clientX - multislider.offsetLeft) / multisliderWidth));
-//        console.log(clientX + ' ' + multisliderWidth  + ' ' + multislider.offsetLeft + ' ' + localXFrac);
-        if (localXFrac < 0) localXFrac = 0;
-        if (localXFrac > 1) localXFrac = 1;
-        return localXFrac;
+    function getXFractionRev (clientX) {
+        let localXFrac = (1 - ((clientX - multislider.offsetLeft)) / multisliderWidth);
+        return clamp(localXFrac, 0, 1);
     }
 
     function setDirection () {
@@ -154,7 +137,8 @@ function multislider(elem, config){
             sliderType = 'mhslider';
             innerBorder = 'border-top';
             multislider.style.flexDirection = "column";
-            moveListener = moveListenerX;
+            mouseMoveListener = mouseMoveListenerX;
+            mouseDownListener = mouseDownListenerX;
             getYFrac = getYFractionRev;
             getXFrac = getXFraction;
             break;
@@ -162,87 +146,113 @@ function multislider(elem, config){
             sliderType = 'mhslider';
             innerBorder = 'border-top';
             multislider.style.flexDirection = "column";
-            moveListener = moveListenerX;
+            mouseMoveListener = mouseMoveListenerX;
+            mouseDownListener = mouseDownListenerX;
             getYFrac = getYFractionRev;
             getXFrac = getXFraction;
             break;
         case 'down':
             sliderType = 'mvslider';
             innerBorder = 'border-left';
-            moveListener = moveListenerY;
+            mouseMoveListener = mouseMoveListenerY;
+            mouseDownListener = mouseDownListenerY;
             getYFrac = getYFraction;
             getXFrac = getXFraction;
             break;
         default: // 'up'
             sliderType = 'mvslider';
             innerBorder = 'border-left';
-            moveListener = moveListenerY;
+            mouseMoveListener = mouseMoveListenerY;
+            mouseDownListener = mouseDownListenerY;
             getYFrac = getYFraction;
             getXFrac = getXFraction;
         }
     }
 
-    var moved = false;
-    var oldXFraction = -1;
-    var oldYFraction = -1;
+    // mouse handling
     
-    function downListener (event) {
+    var moved = false;
+    var lastIdx = false;
+    var lastFraction = false;
+    
+    function mouseDownListenerY (event) {
         moved = false;
-        moveListener(event);
-        document.addEventListener('mousemove', moveListener);
-        document.addEventListener('mouseup', upListener);
-    }
-
-    // function linVal (Frac) {
-    //     return (minValue + (Frac * valueRange));
-    // }
-    // 
-    // function logVal (Frac) {
-    //     if ((Frac == 0) && (clipZero == 'true')) {
-    //         return 0;
-    //     }
-    //     else {
-    //         return (minValue * Math.pow(valueRatio, Frac));
-    //     }
-    // }
-    // 
-    // function linValRev (Frac) {
-    //     return (minValue + ((1 - Frac) * valueRange));
-    // }
-    // 
-    // function logValRev (Frac) {
-    //     if ((Frac == 0) && (clipZero == 'true')) {
-    //         return 0;
-    //     }
-    //     else {
-    //         return (minValue * Math.pow(valueRatio, (1-Frac)));
-    //     }
-    // }
-
-    var lastValue;
-    var lastIdx;
-    function moveListenerY (event) {
-        moved = true;
         let YFraction = getYFrac(event.clientY);
         let XFraction = getXFrac(event.clientX);
         idx = Math.floor(getXFrac(event.clientX)*numSliders);
         if (idx >= numSliders) idx = numSliders - 1;
         sliders[idx].setBarSize(YFraction);
+        lastFraction = YFraction;
+        lastIdx = idx;
+        document.addEventListener('mousemove', mouseMoveListener);
+        document.addEventListener('mouseup', mouseUpListener);
     }
 
-    function moveListenerX (event) {
-        moved = true;
+
+    function mouseDownListenerX (event) {
+        moved = false;
         let YFraction = getYFrac(event.clientY);
         let XFraction = getXFrac(event.clientX);
         idx = Math.floor(getYFrac(event.clientY)*numSliders);
         if (idx >= numSliders) idx = numSliders - 1;
         sliders[idx].setBarSize(XFraction);
+        lastFraction = YFraction;
+        lastIdx = idx;
+        document.addEventListener('mousemove', mouseMoveListener);
+        document.addEventListener('mouseup', mouseUpListener);
     }
 
+    function interpolateSetBarSize (idx, fraction) {
+        let dIdx = idx - lastIdx;
+        let dFraction = fraction - lastFraction;
+        if (lastIdx && (idx != lastIdx)) {
+            if (idx > lastIdx) {
+                for (let i = idx; i > lastIdx;i--) {
+                    let f = fraction + ((i-idx)/dIdx * dFraction);
+                    sliders[i].setBarSize(f);
+                }
+            }
+            else {
+                for (let i = idx; i < lastIdx;i++) {
+                    let f = fraction + ((i-idx)/dIdx * dFraction);
+                    sliders[i].setBarSize(f);
+                    sliders[i].setBarSize(f);
+                }
+            }
+        }
+        else sliders[idx].setBarSize(fraction);
+    }
     
-    function upListener (event){
-        document.removeEventListener('mousemove', moveListener);
-        document.removeEventListener('mouseup', upListener);
+    function mouseMoveListenerY (event) {
+        moved = true;
+        let YFraction = getYFrac(event.clientY);
+        let XFraction = getXFrac(event.clientX);
+        idx = Math.floor(getXFrac(event.clientX)*numSliders);
+        if (idx >= numSliders) idx = numSliders - 1;
+//        console.log('mouseMoveListener' + idx + ' ' + lastIdx + ' ' + YFraction + ' ' + lastFraction);
+        if ((idx != lastIdx) || (YFraction != lastFraction)) {
+            interpolateSetBarSize(idx, YFraction);
+            lastFraction = YFraction;
+            lastIdx = idx;
+        }
+    }
+
+    function mouseMoveListenerX (event) {
+        moved = true;
+        let YFraction = getYFrac(event.clientY);
+        let XFraction = getXFrac(event.clientX);
+        idx = Math.floor(getYFrac(event.clientY)*numSliders);
+        if (idx >= numSliders) idx = numSliders - 1;
+        if ((idx != lastIdx) || (XFraction != lastFraction)) {
+            interpolateSetBarSize(idx, XFraction);
+            lastFraction = XFraction;
+            lastIdx = idx;
+        }
+    }
+
+    function mouseUpListener (event){
+        document.removeEventListener('mousemove', mouseMoveListener);
+        document.removeEventListener('mouseup', mouseUpListener);
     }
 
     function init () {
@@ -250,12 +260,9 @@ function multislider(elem, config){
         setSliderWidthVal();
         setMinMaxMapping();
         setDirection();
-//        valFunction = linVal;
-//        console.log('multisliderHeight: ' + multisliderHeight + 'sliderWidth: ' + multisliderWidth);
         multislider.sliders = createSliders(numSliders, multislider);
         sliders = multislider.sliders;
-        moveListener = moveListener;
-        multislider.addEventListener('mousedown', downListener);
+        multislider.addEventListener('mousedown', mouseDownListener);
 
     }
 
