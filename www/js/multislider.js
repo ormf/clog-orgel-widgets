@@ -61,7 +61,6 @@ function multislider(elem, config){
         let idx;
         for (let i = 0; i < num; i++) {
             tmp = makeSlider(parent.children[i]);
-            //            parent.appendChild(tmp);
             idx = tmp.getAttribute('data-idx');
             tmp.style.setProperty("--bar-color", colors[idx%numColors]);
             sliders[idx] = tmp;
@@ -73,14 +72,7 @@ function multislider(elem, config){
     }
 
     var style = window.getComputedStyle(multislider, null);
-    
-    function setSliderBarStyle () {
-        sliderBar.style.position = 'absolute';
-        sliderBar.style.backgroundColor = barColor;
-        sliderBar.style.border = 'none';
-        sliderBar.style.borderRadius = 'inherit';
-    }
-    
+        
     function setMinMaxMapping() {
         minValue      = parseFloat(multislider.getAttribute("data-min")) || 0.0;
         maxValue      = parseFloat(multislider.getAttribute("data-max")) || 1.0;
@@ -109,24 +101,7 @@ function multislider(elem, config){
         else {
             valueRange = maxValue-minValue;
         }
-        setSliderValue();
         setDirection();
-    }
-
-    function setSliderValue () {
-        value = parseFloat(multislider.getAttribute("data-value")) || 0.0;
-        if (maxValue > minValue) {
-            if (value < minValue) { value = minvalue }
-            else {
-                if (value > maxValue) { value = maxvalue }
-            }
-        }
-        else {
-            if (value > minValue) { value = minvalue }
-            else {
-                if (value < maxValue) { value = maxvalue }
-            }
-        }
     }
     
     function setSliderHeightVal () {
@@ -218,31 +193,31 @@ function multislider(elem, config){
         document.addEventListener('mouseup', upListener);
     }
 
-    function linVal (Frac) {
-        return (minValue + (Frac * valueRange));
-    }
-
-    function logVal (Frac) {
-        if ((Frac == 0) && (clipZero == 'true')) {
-            return 0;
-        }
-        else {
-            return (minValue * Math.pow(valueRatio, Frac));
-        }
-    }
-
-    function linValRev (Frac) {
-        return (minValue + ((1 - Frac) * valueRange));
-    }
-
-    function logValRev (Frac) {
-        if ((Frac == 0) && (clipZero == 'true')) {
-            return 0;
-        }
-        else {
-            return (minValue * Math.pow(valueRatio, (1-Frac)));
-        }
-    }
+    // function linVal (Frac) {
+    //     return (minValue + (Frac * valueRange));
+    // }
+    // 
+    // function logVal (Frac) {
+    //     if ((Frac == 0) && (clipZero == 'true')) {
+    //         return 0;
+    //     }
+    //     else {
+    //         return (minValue * Math.pow(valueRatio, Frac));
+    //     }
+    // }
+    // 
+    // function linValRev (Frac) {
+    //     return (minValue + ((1 - Frac) * valueRange));
+    // }
+    // 
+    // function logValRev (Frac) {
+    //     if ((Frac == 0) && (clipZero == 'true')) {
+    //         return 0;
+    //     }
+    //     else {
+    //         return (minValue * Math.pow(valueRatio, (1-Frac)));
+    //     }
+    // }
 
     var lastValue;
     var lastIdx;
@@ -252,19 +227,7 @@ function multislider(elem, config){
         let XFraction = getXFrac(event.clientX);
         idx = Math.floor(getXFrac(event.clientX)*numSliders);
         if (idx >= numSliders) idx = numSliders - 1;
-        if ((YFraction != oldYFraction) || (idx != lastIdx)) {
-            let newValue = valFunction(YFraction);
-//            console.log('idx: ' + idx + ', newValue: ' + newValue);
-            
-//            multislider.setAttribute('data-value', newValue);
-//            multislider.dispatchEvent(valChangeEvent);
-            sliders[idx].setBarSize(newValue);
-            sliders[idx].dispatchValChangeEvent();
-            oldYFraction = YFraction;
-            oldXFraction = XFraction;
-            lastValue = newValue;
-            lastIdx = idx;
-        }
+        sliders[idx].setBarSize(YFraction);
     }
 
     function moveListenerX (event) {
@@ -273,19 +236,7 @@ function multislider(elem, config){
         let XFraction = getXFrac(event.clientX);
         idx = Math.floor(getYFrac(event.clientY)*numSliders);
         if (idx >= numSliders) idx = numSliders - 1;
-        if ((XFraction != oldXFraction) || (idx != lastIdx)) {
-            let newValue = valFunction(XFraction);
-//            console.log('idx: ' + idx + ', newValue: ' + newValue);
-            
-//            multislider.setAttribute('data-value', newValue);
-//            multislider.dispatchEvent(valChangeEvent);
-            sliders[idx].setBarSize(newValue);
-            sliders[idx].dispatchValChangeEvent();
-            oldYFraction = YFraction;
-            oldXFraction = XFraction;
-            lastValue = newValue;
-            lastIdx = idx;
-        }
+        sliders[idx].setBarSize(XFraction);
     }
 
     
@@ -299,7 +250,7 @@ function multislider(elem, config){
         setSliderWidthVal();
         setMinMaxMapping();
         setDirection();
-        valFunction = linVal;
+//        valFunction = linVal;
 //        console.log('multisliderHeight: ' + multisliderHeight + 'sliderWidth: ' + multisliderWidth);
         multislider.sliders = createSliders(numSliders, multislider);
         sliders = multislider.sliders;

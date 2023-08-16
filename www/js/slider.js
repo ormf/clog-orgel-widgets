@@ -114,16 +114,19 @@ function slider(elem, config){
     }
 
     slider.setBarSize = function (fraction) {
-        let newValue = valFunction(fraction);
-        if (newValue != oldValue) {
-            oldValue = newValue;
-            externalValueChange = false;
-            calcBarSize(fraction);
-            slider.setAttribute('data-value', newValue);
-            externalValueChange = true;
+        if (fraction != oldFraction) {
+            oldFraction = fraction;
+            let newValue = valFunction(fraction);
+            if (newValue != oldValue) {
+                oldValue = newValue;
+                externalValueChange = false;
+                calcBarSize(fraction);
+                slider.setAttribute('data-value', newValue);
+                externalValueChange = true;
+                return newValue;
+            }
         }
-        
-        return newValue;
+        return oldValue;
     }
 
     // Attribute change handler
@@ -297,20 +300,12 @@ function slider(elem, config){
 
     function mouseMoveListenerY (event) {
         moved = true;
-        let YFraction = getYFraction(event.clientY);
-        if (YFraction != oldFraction) {
-            oldFraction = YFraction;
-            slider.setBarSize(YFraction);
-        }
+        slider.setBarSize(getYFraction(event.clientY));
     }
     
     function mouseMoveListenerX (event) {
         moved = true;
-        let XFraction = getXFraction(event.clientX);
-        if (XFraction != oldFraction) {
-            oldFraction = XFraction;
-            slider.setBarSize(XFraction);
-        }
+        slider.setBarSize(getYFraction(event.clientX));
     }
 
     function mouseUpListener (event){
