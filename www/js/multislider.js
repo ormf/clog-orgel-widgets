@@ -66,7 +66,7 @@ function multislider(elem, config){
             tmp.style.setProperty("--bar-color", colors[idx%numColors]);
             sliders[idx] = tmp;
             slider(tmp, { thumb: 'nil' });
-            tmp.removeDownListener();
+            tmp.removeMouseDownListener();
         }
         sliders[0].style.setProperty(innerBorder, '');
         return sliders;

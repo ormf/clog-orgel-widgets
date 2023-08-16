@@ -105,11 +105,13 @@
                               :data-direction direction)))
 ;;;     (break "~S" css)
      (js-execute slider (format nil "slider(~A, { \"thumb\": '~(~a~)'})" (jquery slider) (if thumb "true" "false")))
-     (clog::set-event slider "valuechange"
-                      (lambda (data)
-                        (declare (ignore data))
-                        (let ((val-string (attribute slider "data-value")))
-                          (if val-change-cb (funcall val-change-cb val-string slider)))))
+     (if val-change-cb
+         (progn
+           (clog::set-event slider "valuechange"
+                            (lambda (data)
+                              (declare (ignore data))
+                              (let ((val-string (attribute slider "data-value")))
+                                (funcall val-change-cb val-string slider))))))
      slider))
 
 (defun vslider
