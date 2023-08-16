@@ -117,9 +117,10 @@ function slider(elem, config){
         let newValue = valFunction(fraction);
         if (newValue != oldValue) {
             oldValue = newValue;
-            slider.dispatchEvent(valChangeEvent);
-            slider.setAttribute('data-value', newValue);
+            externalValueChange = false;
             calcBarSize(fraction);
+            slider.setAttribute('data-value', newValue);
+            externalValueChange = true;
         }
         
         return newValue;
@@ -127,7 +128,30 @@ function slider(elem, config){
 
     // Attribute change handler
 
-    
+
+    // flag indicating whether a Value Change is triggered by an
+    // external program or by mouse interaction/from multislider. In
+    // case it is triggered by an external program (via setAttribute),
+    // the value has to be reverse calculated into a slider fraction
+    // and no valuechange event is generated.
+
+    externalValueChange = true;
+
+    // override setAttribute
+
+    const mySetAttribute = slider.setAttribute;
+
+    slider.setAttribute = function (key, value) {
+            mySetAttribute.call(slider, key, value);
+        if (key == 'data-value')
+            if ((externalValueChange) && (value != oldValue)) {
+                oldValue = value;
+                let fraction = valFunctionRev(value);
+                calcBarSize(fraction);
+            }
+        else 
+            slider.dispatchEvent(valChangeEvent);
+    }
     
     // setup routines
 
