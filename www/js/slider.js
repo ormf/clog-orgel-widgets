@@ -109,19 +109,35 @@ function slider(elem, config){
     }
 
     function calcBarHeight (YFraction) {
-        sliderBar.style.height = (YFraction * (sliderHeight - thumbWidth)) + 'px';
+        let newBarSize = (YFraction * (sliderHeight - thumbWidth)) + 'px';
+        if (newBarSize != oldBarSize) {
+            oldBarSize = newBarSize;
+            sliderBar.style.height = newBarSize;
+        }
     }
 
     function calcBarHeightRev (YFraction) {
-        sliderBar.style.height = ((1 - YFraction) * (sliderHeight - thumbWidth)) + 'px';
+        let newBarSize = ((1 - YFraction) * (sliderHeight - thumbWidth)) + 'px';
+        if (newBarSize != oldBarSize) {
+            oldBarSize = newBarSize;
+            sliderBar.style.height = newBarSize;
+        }
     }
 
     function calcBarWidth (YFraction) {
-        sliderBar.style.width = (YFraction * (sliderWidth - thumbWidth)) + 'px';
+        let newBarSize = (YFraction * (sliderWidth - thumbWidth)) + 'px';
+        if (newBarSize != oldBarSize) {
+            oldBarSize = newBarSize;
+            sliderBar.style.width = newBarSize;
+        }
     }
 
     function calcBarWidthRev (YFraction) {
-        sliderBar.style.width = ((1 - YFraction) * (sliderWidth - thumbWidth)) + 'px';
+        let newBarSize = ((1 - YFraction) * (sliderWidth - thumbWidth)) + 'px';
+        if (newBarSize != oldBarSize) {
+            oldBarSize = newBarSize;
+            sliderBar.style.width = newBarSize;
+        }
     }
 
     function setDirection () {
@@ -198,11 +214,16 @@ function slider(elem, config){
         }
     }
 
+    // Mouse Event Handlers
+    
     var moved = false;
-    var oldFraction = -1;
+    var oldFraction = false;
+    var oldValue = false;
+    var oldBarSize = false;
     
     function mouseDownListener (event) {
         moved = false;
+        oldFraction = false;
         mouseMoveListener(event);
         document.addEventListener('mousemove', mouseMoveListener);
         document.addEventListener('mouseup', mouseUpListener);
@@ -234,34 +255,32 @@ function slider(elem, config){
         }
     }
 
+    slider.setBarSize = function (fraction) {
+        let newValue = valFunction(fraction);
+        if (newValue != oldValue) {
+            oldValue = newValue;
+            slider.dispatchEvent(valChangeEvent);
+            slider.setAttribute('data-value', newValue);
+            calcBarSize(fraction);
+        }
+        return newValue;
+    }
+
     function mouseMoveListenerY (event) {
         moved = true;
         let YFraction = getYFraction(event.clientY);
         if (YFraction != oldFraction) {
-            let newValue = valFunction(YFraction);
-            calcBarSize(YFraction);
-            slider.setAttribute('data-value', newValue);
-            slider.dispatchEvent(valChangeEvent);
             oldFraction = YFraction;
+            slider.setBarSize(YFraction);
         }
-    }
-
-    slider.setBarSize = function (fraction) {
-        let newValue = valFunction(fraction);
-        calcBarSize(fraction);
-        slider.setAttribute('data-value', newValue);
-        return newValue;
     }
     
     function mouseMoveListenerX (event) {
         moved = true;
         let XFraction = getXFraction(event.clientX);
         if (XFraction != oldFraction) {
-            let newValue = valFunction(XFraction);
-            calcBarSize(XFraction);
-            slider.setAttribute('data-value', newValue);
-            slider.dispatchEvent(valChangeEvent);
             oldFraction = XFraction;
+            slider.setBarSize(YFraction);
         }
     }
 
