@@ -53,7 +53,7 @@
       ;;                                :val-change-cb (lambda (idx val obj)
       ;;                                                 (format t "slider ~a of element ~S changed to ~a~%" idx obj val))))
 ;;;      (toggle gui-container)
-      (numbox gui-container :css '(:margin 100)
+      (numbox gui-container :css '(:margin 10px :width 50px)
               :min 10 :max 100 :value 300
                             :val-change-cb (lambda (value obj) (declare (ignore obj)) (format t "numbox value: ~a~%" value)))
       ;; (vslider gui-container

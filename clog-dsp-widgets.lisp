@@ -214,6 +214,8 @@
                  &allow-other-keys)
   (declare (ignorable slot min max))
   (let* ((css (getf args :css))
+         (width (getf css :width))
+         (height (getf css :height))
          (numbox
            (create-form-element
             container :text
@@ -226,9 +228,11 @@
                     :--textbox-selected-foreground ,selected-foreground
                     :--textbox-selected-background ,selected-background
                     :font-size ,(addpx size)
-                    :width ,(addpx (* size 5))
-                    :height ,(addpx (* size 2)))
-                  css)
+                    :width ,(or width (addpx (* size 5)))
+                    :height ,(or height (addpx (* size 1.7))))
+                  (progn
+                    (dolist (prop '(:width :height :font-size)) (remf css prop))
+                    css))
             :data-min (or (getf args :min) "false")
             :data-max (or (getf args :max) "false")
             :label (if label (create-label container :content (ensure-string label) :css '(:margin-right 0) :style label-style)))))
