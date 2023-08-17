@@ -218,7 +218,7 @@
            (create-form-element
             container :text
             :class "numbox"
-            :value (format nil "~,1f" value)
+            :value value
             :css (append
                   `(:--text-color ,color
                     :align center

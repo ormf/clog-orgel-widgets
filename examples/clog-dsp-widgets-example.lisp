@@ -54,7 +54,7 @@
       ;;                                                 (format t "slider ~a of element ~S changed to ~a~%" idx obj val))))
 ;;;      (toggle gui-container)
       (numbox gui-container :css '(:margin 100)
-              :min 10 :max 100
+              :min 10 :max 100 :value 300
                             :val-change-cb (lambda (value obj) (declare (ignore obj)) (format t "numbox value: ~a~%" value)))
       ;; (vslider gui-container
       ;;          :css '(:height 100px :flex "0 0 auto"

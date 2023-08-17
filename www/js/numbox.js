@@ -250,7 +250,6 @@ function numbox(elem){
         numboxHeight = parseFloat(style.height.match(pxRegex)[1]);
         numboxWidth = parseFloat(style.width.match(pxRegex)[1]);
         numbox.addEventListener('mousedown', mouseDownListener);
-        numbox.value = formatNumBox(parseFloat(numbox.value));
         minValue = parseFloat(numbox.getAttribute('data-min'));
         maxValue = parseFloat(numbox.getAttribute('data-max'));
         if (isNaN(minValue)) {
@@ -261,6 +260,10 @@ function numbox(elem){
             numbox.setAttribute('data-max', "false");
             maxValue = false;
         }
+        let value = parseFloat(numbox.value);
+        if (isNaN(value)) value = minValue;
+        else value = checkMinMax(value);
+        numbox.value = formatNumBox(value);
     }
 
     init();
