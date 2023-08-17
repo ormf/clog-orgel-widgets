@@ -1,3 +1,29 @@
+//
+// multislider.js
+//
+// definition of multislider mouse and event handling in the client.
+// For this to work, slider.js needs to have been
+// loaded. multislider() gets called with the container of the sliders
+// already containing the sliders as uninitialized div elements with
+// their idx set in the data-idx attribute.
+//
+// **********************************************************************
+// Copyright (c) 2023 Orm Finnendahl <orm.finnendahl@selma.hfmdk-frankfurt.de>
+//
+// Revision history: See git repository.
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the Gnu Public License, version 2 or
+// later. See https://www.gnu.org/licenses/gpl-2.0.html for the text
+// of this agreement.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// **********************************************************************
+
 function multislider(elem, config) {
     var thumb         = config.thumb || 'true';
     const pxRegex = /([0-9]+).*/
@@ -9,40 +35,33 @@ function multislider(elem, config) {
     
     var offsetTop = multislider.offsetTop;
     var offsetLeft = multislider.offsetLeft;
-    var multisliderHeight;
-    var multisliderWidth;
-    var minValue;
-    var maxValue;
-    var value;
+    var multisliderHeight, multisliderWidth;
+    var minValue, maxValue, value;
     var mapping;
     var direction;
     var clipZero = multislider.getAttribute('data-clip-zero');
-    var mouseDownListener;
-    var mouseMoveListener;
-    var innerBorder;
+    var mouseDownListener, mouseMoveListener;
     var sliders;
-    var sliderType;
-    var getXFrac;
-    var getYFrac;
+    var sliderType; // mvslider or mhslider, depending on direction
+    var getXFrac, getYFrac;  // functions for calculating the
+                             // X/YFraction on mousemove depending on
+                             // direction of the sliders.
+    var innerBorder;     // we set one of the borders between the
+                         // sliders to none except for the border of
+    // the first slider. Depending on the direction of the sliders,
+    // this is either border-top or border-left.
     
     function clamp(number, min, max) {
         return Math.max(min, Math.min(number, max));
-    }
-
-    function nullFunc () {
-        return false;
     }
 
     function disableDrag (elem) {
         elem.ondragstart = () => { return false; }
     }
     
-    
     function makeSlider (div) {
         div.setAttribute('class', sliderType);
-        div.setAttribute('class', sliderType);
         div.setAttribute('style', 'border: 1px solid black;flex: 1 0 auto;');
-        div.style.setProperty(innerBorder, 'none');
         div.setAttribute('data-min', minValue);
         div.setAttribute('data-max', maxValue);
         div.setAttribute('data-value', '0');
@@ -53,23 +72,22 @@ function multislider(elem, config) {
         div.style.setProperty('--thumb-color', 'black');
         div.style.width = '';
         div.style.height = '';
-//        div.setAttribute('', '');
         return div;
     }
 
     function createSliders (num, parent) {
         let sliders = new Array(num);
-        let tmp;
+        let currSlider;
         let idx;
         for (let i = 0; i < num; i++) {
-            tmp = makeSlider(parent.children[i]);
-            idx = tmp.getAttribute('data-idx');
-            tmp.style.setProperty("--bar-color", colors[idx%numColors]);
-            sliders[idx] = tmp;
-            slider(tmp, { thumb: 'nil' });
-            tmp.removeMouseDownListener();
+            currSlider = makeSlider(parent.children[i]);
+            idx = currSlider.getAttribute('data-idx');
+            currSlider.style.setProperty("--bar-color", colors[idx%numColors]);
+            if (i > 0) currSlider.style.setProperty(innerBorder, 'none');
+            sliders[idx] = currSlider;
+            slider(currSlider, { thumb: 'nil' });
+            currSlider.removeMouseDownListener();
         }
-        sliders[0].style.setProperty(innerBorder, '');
         return sliders;
     }
 
@@ -145,37 +163,37 @@ function multislider(elem, config) {
         switch (direction) {
         case 'right':
             sliderType = 'mhslider';
+            getXFrac = getXFraction;
+            getYFrac = getYFractionRev;
             innerBorder = 'border-top';
             multislider.style.flexDirection = "column";
             mouseMoveListener = mouseMoveListenerX;
             mouseDownListener = mouseDownListenerX;
-            getYFrac = getYFractionRev;
-            getXFrac = getXFraction;
             break;
         case 'left':
             sliderType = 'mhslider';
+            getXFrac = getXFraction;
+            getYFrac = getYFractionRev;
             innerBorder = 'border-top';
             multislider.style.flexDirection = "column";
             mouseMoveListener = mouseMoveListenerX;
             mouseDownListener = mouseDownListenerX;
-            getYFrac = getYFractionRev;
-            getXFrac = getXFraction;
             break;
         case 'down':
             sliderType = 'mvslider';
+            getXFrac = getXFraction;
+            getYFrac = getYFraction;
             innerBorder = 'border-left';
             mouseMoveListener = mouseMoveListenerY;
             mouseDownListener = mouseDownListenerY;
-            getYFrac = getYFraction;
-            getXFrac = getXFraction;
             break;
         default: // 'up'
             sliderType = 'mvslider';
+            getXFrac = getXFraction;
+            getYFrac = getYFraction;
             innerBorder = 'border-left';
             mouseMoveListener = mouseMoveListenerY;
             mouseDownListener = mouseDownListenerY;
-            getYFrac = getYFraction;
-            getXFrac = getXFraction;
         }
     }
 

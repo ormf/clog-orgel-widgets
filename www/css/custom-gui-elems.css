@@ -10,6 +10,7 @@
     --slider-thumb-width: 100%;
     --textbox-selected-background: #3071A9;
     --textbox-selected-foreground: white;
+    --textbox-caret-color: white;
     --toggle-background: white;
     --vu-background: #444;
     /* --slider-background: #ff0000; */
@@ -42,9 +43,15 @@ button:active{
     background-color: orange;
 }
 
-
-
 input[type=text] {
+    caret-color: var(--textbox-caret-color);
+}
+
+
+
+input[type=text]::selection {
+    caret-color: transparent;
+
     /* color: var(--textbox-selected-foreground); */
     /* background-color: var(--textbox-selected-background); */
 }
@@ -88,7 +95,7 @@ input[type="checkbox"]:checked+label::before {
 
 .numbox::selection {
     user-select: none;
-    color: var(--textbox-selected-foreground); 
+    color: var(--textbox-selected-foreground);
     background-color: var(--textbox-selected-background);
 }
 

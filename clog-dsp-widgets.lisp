@@ -199,46 +199,58 @@
     ((member direction '("up" "down") :test #'string=) 'up)
     (t nil)))
 
-(defun numbox (container &key (color "#3071A9")
-                           (background-color "#fff")
-                           (selected-foreground "black")
-                           (selected-background "lightblue")
-                           (min 0)
-                           (max 127)
-                           (value 0)
-                           (size 10)
-                           label
-                           label-style
-                           slot
-                           val-change-cb)
+(defun numbox (container &rest args
+               &key (color "#3071A9")
+                 (background-color "#fff")
+                 (selected-foreground "black")
+                 (selected-background "lightblue")
+                 (min 0)
+                 (max 127)
+                 (value 0)
+                 (size 10)
+                 label
+                 label-style
+                 slot
+                 val-change-cb
+                 &allow-other-keys)
   (declare (ignorable slot))
-  (let ((elem
-          (create-form-element
-           container :text
-           :class "numbox"
-           :value (format nil "~,1f" value)
-           :css `(:--text-color ,color
-                  :align center
-                  :background-color ,background-color
-                  :--textbox-selected-foreground ,selected-foreground
-                  :--textbox-selected-background ,selected-background
-                  :font-size ,(addpx size)
-                  :width ,(addpx (* size 5))
-                  :height ,(addpx (* size 2)))
-           :min min
-           :max max
-           :label (if label (create-label container :content (ensure-string label) :css '(:margin-right 0) :style label-style))))
-        mouse-dragged
-        startvalue)
-;;;    (clog::unbind-event-script elem "onmousedown")
+  (let* ((css (getf args :css))
+         (numbox
+           (create-form-element
+            container :text
+            :class "numbox"
+            :value (format nil "~,1f" value)
+            :css (append
+                  `(:--text-color ,color
+                    :align center
+                    :background-color ,background-color
+                    :--textbox-selected-foreground ,selected-foreground
+                    :--textbox-selected-background ,selected-background
+                    :font-size ,(addpx size)
+                    :width ,(addpx (* size 5))
+                    :height ,(addpx (* size 2)))
+                  css)
+            :min min
+            :max max
+            :label (if label (create-label container :content (ensure-string label) :css '(:margin-right 0) :style label-style)))))
+;;;    (clog::unbind-event-script numbox "onmousedown")
+     (js-execute numbox (format nil "numbox(~A)" (jquery numbox)))
+     (if val-change-cb
+         (progn
+           (clog::set-event numbox "valuechange"
+                            (lambda (data)
+                              (declare (ignore data))
+                              (let ((val-string (attribute numbox "value")))
+                                (funcall val-change-cb val-string numbox))))))    
+    #|
     (set-on-mouse-down
-     elem
+     numbox
      (lambda (obj event-data)
        (declare (ignore obj))
-       (setf startvalue (read-from-string (or (value elem) "0")))
+       (setf startvalue (read-from-string (or (value numbox) "0")))
        (let ((startpos (getf event-data :y)))
          (set-on-mouse-move
-          elem
+          numbox
           (let ((last-y startpos) (last-val startvalue))
             (lambda (obj event-data)
               (declare (ignore obj))
@@ -248,26 +260,26 @@
                      (val (+ last-val (* scale (- last-y y)))))
                 (when (/= y last-y)
                   (unless mouse-dragged
-                    (setf (style elem "--textbox-selected-foreground") color)
-                    (setf (style elem "--textbox-selected-background") background-color))
+                    (setf (style numbox "--textbox-selected-foreground") color)
+                    (setf (style numbox "--textbox-selected-background") background-color))
                   (setf mouse-dragged t)
                   (let ((val-string (format nil "~,1f" val)))
-                    (setf (value elem) val-string)
-                    (if val-change-cb (funcall val-change-cb val-string elem)))
-                  (setf last-y y last-val val)))))))))
+                    (setf (value numbox) val-string)
+                    (if val-change-cb (funcall val-change-cb val-string numbox)))
+    (setf last-y y last-val val)))))))))
     ;; (set-on-key-up
-    ;;  elem
+    ;;  numbox
     ;;  (lambda (obj event)
     ;;    (declare (ignore obj))
     ;;    (when (equal (getf event :key) "Enter")
-    ;;      (let ((val (value elem)))
+    ;;      (let ((val (value numbox)))
     ;;        (unless (numberp (read-from-string val))
     ;;          (setf val (format nil "~,1f" startvalue)))
-    ;;        (setf (value elem) val)
-    ;;        (if val-change-cb (funcall val-change-cb val elem)))
-    ;;      (blur elem))))
+    ;;        (setf (value numbox) val)
+    ;;        (if val-change-cb (funcall val-change-cb val numbox)))
+    ;;      (blur numbox))))
     (set-on-mouse-up
-     elem
+     numbox
      (lambda (obj event-data)
        (declare (ignore event-data))
        (format t "mouse-up~%")
@@ -276,11 +288,13 @@
         (lambda (obj event-data)
           (declare (ignore obj event-data))))
        (if mouse-dragged (progn
-                           (blur elem)
+                           (blur numbox)
                            (setf (style obj "--textbox-selected-foreground") selected-foreground))
                            (setf (style obj "--textbox-selected-background") selected-background))
-                           (setf mouse-dragged nil)))
-    elem))
+    (setf mouse-dragged nil)))
+    |#
+
+    numbox))
 
 (defun toggle (container &key (style "") (content "") (size 6)
                            (color "black")

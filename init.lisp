@@ -26,5 +26,6 @@
   (load-script (html-document body) "js/toggle.js")
   (load-script (html-document body) "js/slider.js")
   (load-script (html-document body) "js/multislider.js")
+  (load-script (html-document body) "js/numbox.js")
   (load-css (html-document body) "/css/w3.css")
   (load-css (html-document body) "./css/custom-gui-elems.css"))
