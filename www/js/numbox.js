@@ -88,6 +88,12 @@ function numbox(elem){
         return 0.01;
     }
 
+    function checkMinMax (val) {
+        if (minValue && (val < minValue)) return minValue;
+        else if (maxValue && (val > maxValue)) return maxValue;                
+        return val;
+    }
+    
     // Attribute change handler
 
     // externalValueChange is a flag indicating whether a Value Change
@@ -138,8 +144,6 @@ function numbox(elem){
 
     function handleKeyDown (event) {
         let keyCode = event.which? event.which : event.keyCode;
-//        console.log(keyCode);
-//        console.log(numbox.value.substring(0,1));
         if ((keyCode > 30 && keyCode < 58)
             || keyCode == 190 ||  keyCode == 37 || keyCode == 39 || keyCode == 8
             || (keyCode == 173 && numbox.selectionStart == 0 &&
@@ -171,15 +175,18 @@ function numbox(elem){
 
     function onEditBlurListener () {
         let number = parseFloat(numbox.value);
-        if (isNaN(number)) number = 0;
+        if (isNaN(number)) number = minValue? minValue : 0;
+        else number = checkMinMax(number);
         if (startValue != number)
             numbox.setAttribute('value', number);
         numbox.value = formatNumBox(number);
         numbox.addEventListener('mousedown', mouseDownListener);
         numbox.removeEventListener('blur', onEditBlurListener);
-        externalValueChange = true;
+            externalValueChange = true;
     }
 
+    var currValue;
+    
     function mouseMoveListener (event) {
         let valString;
         if ((moved == false) &&
@@ -189,21 +196,27 @@ function numbox(elem){
                 numbox.style.setProperty('--textbox-selected-background', background);
                 numbox.style.setProperty('--textbox-selected-foreground', foreground);
                 numbox.style.setProperty('--textbox-caret-color', 'transparent');
-                lastValue = startValue + (mouseStartY - event.clientY) * calcNumScale(event.clientX);
-                valString = lastValue.toFixed(2); // while dragging truncate attribute to 2 digits after the comma.
-                numbox.value = valString;
-                numbox.setAttribute('value', valString);
+                currValue = checkMinMax(startValue + (mouseStartY - event.clientY) * calcNumScale(event.clientX));
+                valString = currValue.toFixed(2); // while dragging truncate attribute to 2 digits after the comma.
+                if (valString != lastValue) {
+                    numbox.value = valString;
+                    numbox.setAttribute('value', valString);
+                    lastValue = currValue;
+                }
                 numbox.style.textAlign = 'right'; // and align right.
                 lastY = event.clientY;
             }
             moved = true;
         }
         else { // called while dragging
-            lastValue = lastValue + (lastY - event.clientY) * calcNumScale(event.clientX);
+            currValue = checkMinMax(lastValue + (lastY - event.clientY) * calcNumScale(event.clientX));
             lastY = event.clientY;
-            valString = lastValue.toFixed(2); // while dragging truncate to 2 digits after the comma.
-            numbox.value = valString;
-            numbox.setAttribute('value', valString);
+            valString = currValue.toFixed(2); // while dragging truncate to 2 digits after the comma.
+            if (valString != lastValue) {
+                numbox.value = valString;
+                numbox.setAttribute('value', valString);
+                lastValue = currValue;
+            }
         }
     }
     
@@ -238,6 +251,16 @@ function numbox(elem){
         numboxWidth = parseFloat(style.width.match(pxRegex)[1]);
         numbox.addEventListener('mousedown', mouseDownListener);
         numbox.value = formatNumBox(parseFloat(numbox.value));
+        minValue = parseFloat(numbox.getAttribute('data-min'));
+        maxValue = parseFloat(numbox.getAttribute('data-max'));
+        if (isNaN(minValue)) {
+            numbox.setAttribute('data-min', "false");
+            minValue = false;
+        }
+        if (isNaN(maxValue)) {
+            numbox.setAttribute('data-max', "false");
+            maxValue = false;
+        }
     }
 
     init();

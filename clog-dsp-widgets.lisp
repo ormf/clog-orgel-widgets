@@ -204,16 +204,15 @@
                  (background-color "#fff")
                  (selected-foreground "black")
                  (selected-background "lightblue")
-                 (min 0)
-                 (max 127)
                  (value 0)
                  (size 10)
+                 min max
                  label
                  label-style
                  slot
                  val-change-cb
                  &allow-other-keys)
-  (declare (ignorable slot))
+  (declare (ignorable slot min max))
   (let* ((css (getf args :css))
          (numbox
            (create-form-element
@@ -230,8 +229,8 @@
                     :width ,(addpx (* size 5))
                     :height ,(addpx (* size 2)))
                   css)
-            :min min
-            :max max
+            :data-min (or (getf args :min) "false")
+            :data-max (or (getf args :max) "false")
             :label (if label (create-label container :content (ensure-string label) :css '(:margin-right 0) :style label-style)))))
 ;;;    (clog::unbind-event-script numbox "onmousedown")
      (js-execute numbox (format nil "numbox(~A)" (jquery numbox)))
