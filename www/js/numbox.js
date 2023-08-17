@@ -137,6 +137,28 @@ function numbox(elem){
         document.addEventListener('mouseup', mouseUpListener);
     }
 
+    function handleKeyDown (event) {
+        let keyCode = event.which? event.which : event.keyCode;
+        console.log(keyCode);
+        console.log(numbox.value.substring(0,1));
+        if ((keyCode > 30 && keyCode < 58)
+            || keyCode == 190 ||  keyCode == 37 || keyCode == 39 || keyCode == 8
+            || (keyCode == 173 && numbox.selectionStart == 0 &&
+                ((numbox.value.substring(0,1) != '-') || numbox.selectionEnd > 0)) || keyCode == 13) {
+            if (keyCode == 13) {
+                numbox.blur();
+                numbox.removeEventListener('keydown', this);
+                document.addEventListener('mousedown', mouseDownListener);
+            }
+            return true;
+        }
+        else {
+            event.preventDefault();
+            return false;
+        }
+
+    }
+
     numbox.setEditing = function () {
         numbox.style.setProperty('--textbox-selected-background', selectedBackground);
         numbox.style.setProperty('--textbox-selected-foreground', selectedForeground);
@@ -145,19 +167,14 @@ function numbox(elem){
         document.removeEventListener('mouseup', mouseUpListener);
         numbox.removeEventListener('mousedown', mouseDownListener);
         numbox.addEventListener('blur', onEditBlurListener);
-        numbox.addEventListener ('keydown', function (event) {
-            if (event.key == 'Enter') {
-                numbox.blur();
-                numbox.removeEventListener('keydown', this);
-                document.addEventListener('mousedown', mouseDownListener);
-            }
-        });
+        numbox.addEventListener('keydown', handleKeyDown);
     }
 
     function onEditBlurListener () {
         let number = parseFloat(numbox.value);
+        if (isNaN(number)) number = 0;
         if (startValue != number)
-            numbox.setAttribute('value', numbox.value);
+            numbox.setAttribute('value', number);
         numbox.value = formatNumBox(number);
         numbox.addEventListener('mousedown', mouseDownListener);
         numbox.removeEventListener('blur', onEditBlurListener);
