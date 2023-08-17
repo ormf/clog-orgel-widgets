@@ -132,15 +132,14 @@ function numbox(elem){
         startValue = parseFloat(numbox.getAttribute('value'));
         mouseStartX = event.clientX;
         mouseStartY = event.clientY;
-//        console.log('mouseDownListener: ' + event.clientX + ' ' + event.clientY);
         document.addEventListener('mousemove', mouseMoveListener);
         document.addEventListener('mouseup', mouseUpListener);
     }
 
     function handleKeyDown (event) {
         let keyCode = event.which? event.which : event.keyCode;
-        console.log(keyCode);
-        console.log(numbox.value.substring(0,1));
+//        console.log(keyCode);
+//        console.log(numbox.value.substring(0,1));
         if ((keyCode > 30 && keyCode < 58)
             || keyCode == 190 ||  keyCode == 37 || keyCode == 39 || keyCode == 8
             || (keyCode == 173 && numbox.selectionStart == 0 &&
