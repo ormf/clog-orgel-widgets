@@ -242,59 +242,14 @@
                               (declare (ignore data))
                               (let ((val-string (attribute numbox "value")))
                                 (funcall val-change-cb val-string numbox))))))    
-    #|
-    (set-on-mouse-down
-     numbox
-     (lambda (obj event-data)
-       (declare (ignore obj))
-       (setf startvalue (read-from-string (or (value numbox) "0")))
-       (let ((startpos (getf event-data :y)))
-         (set-on-mouse-move
-          numbox
-          (let ((last-y startpos) (last-val startvalue))
-            (lambda (obj event-data)
-              (declare (ignore obj))
-              (format t "mouse-move~%")
-              (let* ((y (getf event-data :y))
-                     (scale (if (getf event-data :shift-key) 0.1 1))
-                     (val (+ last-val (* scale (- last-y y)))))
-                (when (/= y last-y)
-                  (unless mouse-dragged
-                    (setf (style numbox "--textbox-selected-foreground") color)
-                    (setf (style numbox "--textbox-selected-background") background-color))
-                  (setf mouse-dragged t)
-                  (let ((val-string (format nil "~,1f" val)))
-                    (setf (value numbox) val-string)
-                    (if val-change-cb (funcall val-change-cb val-string numbox)))
-    (setf last-y y last-val val)))))))))
-    ;; (set-on-key-up
-    ;;  numbox
-    ;;  (lambda (obj event)
-    ;;    (declare (ignore obj))
-    ;;    (when (equal (getf event :key) "Enter")
-    ;;      (let ((val (value numbox)))
-    ;;        (unless (numberp (read-from-string val))
-    ;;          (setf val (format nil "~,1f" startvalue)))
-    ;;        (setf (value numbox) val)
-    ;;        (if val-change-cb (funcall val-change-cb val numbox)))
-    ;;      (blur numbox))))
-    (set-on-mouse-up
-     numbox
-     (lambda (obj event-data)
-       (declare (ignore event-data))
-       (format t "mouse-up~%")
-       (set-on-mouse-move
-        obj
-        (lambda (obj event-data)
-          (declare (ignore obj event-data))))
-       (if mouse-dragged (progn
-                           (blur numbox)
-                           (setf (style obj "--textbox-selected-foreground") selected-foreground))
-                           (setf (style obj "--textbox-selected-background") selected-background))
-    (setf mouse-dragged nil)))
-    |#
-
     numbox))
+
+(defmethod text-value ((obj clog-progress-bar))
+  (property obj "value"))
+
+(defmethod (setf text-value) (value (obj clog-progress-bar))
+  (setf (property obj "value") value))
+
 
 (defun toggle (container &key (style "") (content "") (size 6)
                            (color "black")

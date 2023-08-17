@@ -147,3 +147,10 @@ string as content argument."
                 :clog-type  'clog-label
                 :html-id    html-id
                 :auto-place auto-place))
+
+
+(defmethod value ((obj clog-form-element))
+  (property obj "value"))
+
+(defmethod (setf text-value) (value (obj clog-form-element))
+  (setf (property obj "value") value))

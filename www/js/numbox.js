@@ -3,6 +3,14 @@
 //
 // definition of numberbox mouse and event handling in the client.
 //
+// a numberbox is basically an input of type text with added mouse
+// handling for dragging numbers. numbox() has to be called with a
+// <input type="text"> element.
+//
+// WARNING: Currently only changing the value attribute after
+// initialization is supported. All other attribute or style changes
+// after initialization probably have no or detrimental effects.
+//
 // **********************************************************************
 // Copyright (c) 2023 Orm Finnendahl <orm.finnendahl@selma.hfmdk-frankfurt.de>
 //
@@ -62,8 +70,26 @@ function numbox(elem){
 
     }
     
+    function getPrecision (num) {
+        let absNum = Math.abs(num);
+        let fraction = (100 * (absNum - Math.floor(absNum)));
+        if ((fraction == 0) || (fraction == 100)) return 0;
+        if (fraction%10 == 0) return 1;
+        return 2}
+
+    function formatNumBox (value) {
+        return value.toFixed(getPrecision(value));
+    }
+
+    function calcNumScale (mouseX) {
+        if (mouseX < numboxWidth*0.15) return 10;
+        if (mouseX < numboxWidth*0.85) return 1;
+        if (mouseX < numboxWidth) return 0.1;
+        return 0.01;
+    }
+
     // Attribute change handler
-    //
+
     // externalValueChange is a flag indicating whether a Value Change
     // is triggered either by an external program or by mouse
     // interaction. In case it is triggered by an external program
@@ -81,7 +107,7 @@ function numbox(elem){
         mySetAttribute.call(numbox, key, value);
         if (key == 'value') {
             if ((externalValueChange) && (value != lastValue)) {
-                numbox.value = value;
+                numbox.value = formatNumBox(value);
             }
             else 
                 numbox.dispatchEvent(valChangeEvent);
@@ -91,7 +117,7 @@ function numbox(elem){
     // Mouse Event Handlers
     
     var moved = false;
-    var dragged = false;
+    var dragging = false;
     var startValue = false;
     
     var lastX, lastY;
@@ -101,9 +127,9 @@ function numbox(elem){
     
     function mouseDownListener (event) {
         moved = false;
-        dragged = false;
+        dragging = false; // shouldn't be necessary, just in case...
         externalValueChange = false;
-        startValue = parseFloat(numbox.value);
+        startValue = parseFloat(numbox.getAttribute('value'));
         mouseStartX = event.clientX;
         mouseStartY = event.clientY;
 //        console.log('mouseDownListener: ' + event.clientX + ' ' + event.clientY);
@@ -129,82 +155,51 @@ function numbox(elem){
     }
 
     function onEditBlurListener () {
-//        console.log('editingBlur');
-        if (startValue != numbox.value)
-            numbox.setAttribute('value', numbox.value);
         let number = parseFloat(numbox.value);
+        if (startValue != number)
+            numbox.setAttribute('value', numbox.value);
         numbox.value = formatNumBox(number);
         numbox.addEventListener('mousedown', mouseDownListener);
         numbox.removeEventListener('blur', onEditBlurListener);
         externalValueChange = true;
     }
 
-    function getPrecision (num) {
-        let absNum = Math.abs(num);
-        let fraction = Math.round(100 * (absNum - Math.floor(absNum)));
-        if ((fraction == 0) || (fraction == 100)) return 0;
-        if (fraction%10 == 0) return 1;
-        return 2}
-
-    function formatNumBox (value) {
-        return value.toFixed(getPrecision(value));
-    }
-
-    function calcNumScale (mouseX) {
-        if (mouseX < numboxWidth*0.15) return 10;
-        if (mouseX < numboxWidth*0.85) return 1;
-        if (mouseX < numboxWidth) return 0.1;
-        return 0.01;
-    }
-
-
-    
     function mouseMoveListener (event) {
-//        console.log('mouseMoveListener: ' + event.clientX + ' ' + event.clientY);
+        let valString;
         if ((moved == false) &&
-            ((mouseStartX != event.clientX) || (mouseStartY != event.clientY))) { // only called once
-//             if (mouseStartX != event.clientX) {
-// //                console.log('editing');
-//                 numbox.setEditing();
-//             }
-//             else
-            {
-//                console.log('dragging');
-                dragged = true;
-                numbox.style.textAlign = 'right';
+            ((mouseStartX != event.clientX) || (mouseStartY != event.clientY))) {
+            { // called only once after a click and subsequent move.
+                dragging = true;
                 numbox.style.setProperty('--textbox-selected-background', background);
                 numbox.style.setProperty('--textbox-selected-foreground', foreground);
                 numbox.style.setProperty('--textbox-caret-color', 'transparent');
-//                console.log(numbox.style.getPropertyValue('--textbox-selected-background'));
                 lastValue = startValue + (mouseStartY - event.clientY) * calcNumScale(event.clientX);
-//                console.log('firstDrag: ' + startValue + ' ' + mouseStartY + ' ' + event.clientY + ' ' + numScale);
-//                console.log('lastValue: ' + lastValue);
-                numbox.value = lastValue.toFixed(2);
-                numbox.setAttribute('value', lastValue);
+                valString = lastValue.toFixed(2); // while dragging truncate attribute to 2 digits after the comma.
+                numbox.value = valString;
+                numbox.setAttribute('value', valString);
+                numbox.style.textAlign = 'right'; // and align right.
                 lastY = event.clientY;
             }
             moved = true;
         }
-        else {
-//            console.log(lastValue + ' ' + lastY + ' ' + event.clientY + ' ' + numScale);
+        else { // called while dragging
             lastValue = lastValue + (lastY - event.clientY) * calcNumScale(event.clientX);
             lastY = event.clientY;
-            numbox.value = lastValue.toFixed(2);
-//            numbox.value = formatNumBox(lastValue);
-            numbox.setAttribute('value', lastValue);
-            // behaviour while dragging.
+            valString = lastValue.toFixed(2); // while dragging truncate to 2 digits after the comma.
+            numbox.value = valString;
+            numbox.setAttribute('value', valString);
         }
     }
     
     function mouseUpListener (event){
-        if (dragged) {
-//            console.log('draggingBlur');
+        if (dragging) {
             numbox.blur();
-            numbox.style.textAlign = 'center';
-            numbox.value = formatNumBox(parseFloat(numbox.value))
+            numbox.style.textAlign = 'center'; // restore alignment
+            numbox.value = formatNumBox(parseFloat(numbox.getAttribute('value')))
             document.removeEventListener('mousemove', mouseMoveListener);
             document.removeEventListener('mouseup', mouseUpListener);
             externalValueChange = true;
+            dragging = false;
         }
         else {
             numbox.setEditing();
@@ -226,6 +221,7 @@ function numbox(elem){
         numboxHeight = parseFloat(style.height.match(pxRegex)[1]);
         numboxWidth = parseFloat(style.width.match(pxRegex)[1]);
         numbox.addEventListener('mousedown', mouseDownListener);
+        numbox.value = formatNumBox(parseFloat(numbox.value));
     }
 
     init();
