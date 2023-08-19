@@ -270,13 +270,14 @@
                  (label-off "") (label-on "")
                  &allow-other-keys)
   (let* ((css (getf args :css))
+         (background (or (getf args :background-color) background))
          (btn (clog::create-button
                      container
                      :class "toggle"
                      :css (append
                            `(:color ,color
                              :align center
-                             :background-color (or (getf args :background-color) ,background)
+                             :background ,background
                              :--textbox-selected-foreground ,selected-foreground
                              :--textbox-selected-background ,selected-background
                              :font-size ,(addpx size)

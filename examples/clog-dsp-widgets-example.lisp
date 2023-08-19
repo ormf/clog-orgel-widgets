@@ -51,7 +51,10 @@
 ;;;      (toggle gui-container)
 
       (toggle gui-container :css '(:margin 10px :width 17px)
-              :val-change-cb (lambda (x obj) (declare (ignore obj)) (format t "toggle: ~a" x)))
+                            :background "transparent"
+                            :val-change-cb (lambda (x obj)
+                                             (declare (ignore obj))
+                                             (format t "toggle: ~a" x)))
       (numbox gui-container :css '(:margin 10px :width 50px)
               :min 10 :max 100 :value 300
                             :val-change-cb (lambda (value obj) (declare (ignore obj)) (format t "numbox value: ~a~%" value)))

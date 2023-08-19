@@ -20,14 +20,17 @@ function toggle (elem, config) {
     myToggle.setAttribute = function (key, value) {
         mySetAttribute.call(myToggle, key, value);
         //        if (key == 'data-db') drawBoxes(c, value);
-        if (key == 'data-val') drawToggle(myToggle, value);
-        if (externalValueChange == false) {
-            myToggle.dispatchEvent(valChangeEvent);
-            externalValueChange == true;
+        if (key == 'data-val') {
+            drawToggle(myToggle, value);
+            if (externalValueChange == false) {
+                myToggle.dispatchEvent(valChangeEvent);
+                externalValueChange == true;
+            }
         }
     }
     
     var  drawToggle = function (toggle, val) {
+        console.log(val + ' ' + valueOn + ' ' + (val == valueOn) + ' ' + backgroundOff)
         if (val == valueOn) {
             toggle.textContent = labelOn;
             toggle.style.color = colorOn;
@@ -43,7 +46,6 @@ function toggle (elem, config) {
     function mouseDownListener (event) {
         externalValueChange = false;
         let val = (myToggle.getAttribute('data-val') == myToggle.valueOff)? valueOn : valueOff;
-        drawToggle(myToggle,val);
         myToggle.setAttribute('data-val', val);
     }
 
