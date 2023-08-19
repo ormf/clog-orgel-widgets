@@ -13,14 +13,16 @@ function toggle (elem, config) {
     var labelOn          = config.labelOn || '';
     var valueOn          = config.valueOn || '1';
 
-    var value = myToggle.getAttribute('data-val')       || '0';
     // override setAttribute
     const mySetAttribute = myToggle.setAttribute;
-
+    
     myToggle.setAttribute = function (key, value) {
         mySetAttribute.call(myToggle, key, value);
-        //        if (key == 'data-db') drawBoxes(c, value);
         if (key == 'data-val') {
+            if (externalValueChange == true) {
+                value = parseFloat(value).toFixed(0);
+                if (value != valueOff) value = valueOn;
+            }
             drawToggle(myToggle, value);
             if (externalValueChange == false) {
                 myToggle.dispatchEvent(valChangeEvent);
@@ -30,7 +32,6 @@ function toggle (elem, config) {
     }
     
     var  drawToggle = function (toggle, val) {
-        console.log(val + ' ' + valueOn + ' ' + (val == valueOn) + ' ' + backgroundOff)
         if (val == valueOn) {
             toggle.textContent = labelOn;
             toggle.style.color = colorOn;
@@ -64,7 +65,12 @@ function toggle (elem, config) {
         myToggle.valueOn = valueOn;
         myToggle.ondragstart = () => { return false; }
         myToggle.addEventListener('mousedown', mouseDownListener);
-        drawToggle(myToggle, myToggle.value);
+        let val = parseFloat(myToggle.getAttribute('data-val')).toFixed(0);
+        if ((val != valueOff) && (val != valueON)) {
+            val = valueOff;
+            mySetAttribute.call(myToggle, key, val);
+        }
+        drawToggle(myToggle, val);
     }
 
     init();

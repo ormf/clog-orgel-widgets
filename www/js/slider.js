@@ -157,7 +157,7 @@ function slider(elem, config){
                 oldValue = newValue;
                 externalValueChange = false;
                 calcBarSize(fraction);
-                slider.setAttribute('data-value', newValue);
+                slider.setAttribute('data-value', newValue.toFixed(3));
                 externalValueChange = true;
                 return newValue;
             }

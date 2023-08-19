@@ -296,7 +296,7 @@
           (clog::set-event btn "valuechange"
                            (lambda (data)
                              (declare (ignore data))
-                             (let ((val (read-from-string (attribute btn "value"))))
+                             (let ((val (read-from-string (attribute btn "data-val"))))
                                (funcall val-change-cb val btn))))))
     btn))
 
