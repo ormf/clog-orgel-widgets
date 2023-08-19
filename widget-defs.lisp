@@ -238,9 +238,8 @@ UserSelect
                 :html-id    html-id
                 :auto-place auto-place))
 
-
-
-(defun toggle (container &key (style "") (content "") (size 6)
+(defun toggle (container &rest args
+               &key (style "") (content "") (size 6)
                            (color "black")
                            (background "white")
                            (selected-foreground "black")
@@ -248,13 +247,17 @@ UserSelect
                            (value-off "0.0")
                            (value-on "1.0")
                            receiver-fn (toggle-content "")
-                           slot)
+                 slot
+                 &allow-other-keys)
   (declare (ignore slot))
-  (let ((btn (create-button container :class "toggle"
-                                   :style (format nil "~A width: ~A;height: ~Apx;font-size: ~Apt;color: ~A;background-color: ~A;"
-                                                     style (* 5 size) (* 2 size) size color background)
-                                   :content content
-                                   :data-val "0.0")))
+  (let* ((css (getf args :css))
+         (btn (clog::create-button
+               container
+               :class "toggle"
+               :style (format nil "~A width: ~A;height: ~Apx;font-size: ~Apt;color: ~A;background-color: ~A;"
+                              style (* 5 size) (* 2 size) size color background)
+               :content content
+               :data-val "0.0")))
     (let ((str (format nil "toggle(~A, { \"colorOff\": '~(~a~)', \"backgroundOff\": '~(~a~)', \"labelOff\": '~(~a~)', \"valueOff\": '~(~a~)', \"colorOn\": '~(~a~)', \"backgroundOn\": '~(~a~)', \"labelOn\": '~(~a~)', \"valueOn\": '~(~a~)'})"
                             (jquery btn) color background content value-off selected-foreground selected-background toggle-content value-on)))
       (js-execute btn str))
@@ -266,22 +269,6 @@ UserSelect
                            value-off value-on)))
          (setf (attribute btn "data-val") new-val)         
          (if receiver-fn (funcall receiver-fn new-val btn)))))
-;;     (set-on-mouse-down
-;;      btn
-;;      (lambda (obj event)
-;;        (declare (ignore obj event))
-;; ;;;       (setf mouse-down t)
-;;        (if button-state
-;;            (progn
-;;              ;; (setf (style obj "color") color)
-;;              ;; (setf (style obj "background-color") background)
-;;              ;; (setf (text obj) content)
-;;              )
-;;            (progn
-;;              ;; (setf (style obj "color") selected-foreground)
-;;              ;; (setf (style obj "background-color") selected-background)
-;;              ;; (if toggle-content (setf (text obj) toggle-content))
-;;              ))))
     btn))
 
 (deftype vu-type () '(member :led :bar))

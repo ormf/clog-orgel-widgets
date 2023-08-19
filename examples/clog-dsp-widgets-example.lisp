@@ -48,11 +48,10 @@
                                                  :flex-wrap wrap
                                                  :margin-right 15px
                                                  :padding-bottom 30px))))
-      ;; (dotimes (i 20)
-      ;;   (multi-vslider gui-container :num 16 :css '(:width 160px :margin 5px)
-      ;;                                :val-change-cb (lambda (idx val obj)
-      ;;                                                 (format t "slider ~a of element ~S changed to ~a~%" idx obj val))))
 ;;;      (toggle gui-container)
+
+      (toggle gui-container :css '(:margin 10px :width 17px)
+              :val-change-cb (lambda (x obj) (declare (ignore obj)) (format t "toggle: ~a" x)))
       (numbox gui-container :css '(:margin 10px :width 50px)
               :min 10 :max 100 :value 300
                             :val-change-cb (lambda (value obj) (declare (ignore obj)) (format t "numbox value: ~a~%" value)))

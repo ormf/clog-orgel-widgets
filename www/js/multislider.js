@@ -27,12 +27,12 @@
 function multislider(elem, config) {
     var thumb         = config.thumb || 'true';
     const pxRegex = /([0-9]+).*/
-
+    
     var multislider = elem.get(0);
     var numSliders = multislider.getAttribute('data-num-sliders');
-    var colors = JSON.parse(multislider.getAttribute('data-colors'));
+//    var colors = JSON.parse(multislider.getAttribute('data-colors'));
+    var colors    = config.colors ? JSON.parse(config.colors) : ['lightblue'];
     var numColors = colors.length;
-    
     var offsetTop = multislider.offsetTop;
     var offsetLeft = multislider.offsetLeft;
     var multisliderHeight, multisliderWidth;
@@ -289,8 +289,9 @@ function multislider(elem, config) {
         setSliderWidthVal();
         setMinMaxMapping();
         setDirection();
-        multislider.sliders = createSliders(numSliders, multislider);
-        sliders = multislider.sliders;
+        sliders = createSliders(numSliders, multislider);
+        multislider.sliders = multislider.sliders;
+        multislider.colors = colors;
         multislider.addEventListener('mousedown', mouseDownListener);
 
     }

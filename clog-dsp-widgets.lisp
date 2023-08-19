@@ -172,7 +172,6 @@
                           :data-max max
                           :data-mapping mapping
                           :data-clip-zero clip-zero
-                          :data-colors data-colors
                           :data-direction (or (getf args :direction) direction)))
          ;; (subclass (if (member direction '("up" "down") :test #'string=) "mvslider" "mhslider"))
          ;; (inner-border (if (member direction '("up" "down") :test #'string=) :border-left :border-top))
@@ -183,7 +182,7 @@
                       (setf (aref res i)
                             (create-div msl :data-idx i)))
                     res)))
-    (js-execute msl (format nil "multislider(~A, { \"thumb\": '~(~a~)'})" (jquery msl) (if thumb "true" "false")))
+    (js-execute msl (format nil "multislider(~A, { \"colors\": ~a, \"thumb\": '~(~a~)'})" (jquery msl) data-colors (if thumb "true" "false")))
     (dotimes (i num)
       (let ((slider (aref sliders i)))
         (clog::set-event slider "valuechange"
@@ -200,7 +199,8 @@
     (t nil)))
 
 (defun numbox (container &rest args
-               &key (color "#3071A9")
+               &key (style "")
+                 (color "#3071A9")
                  (background-color "#fff")
                  (selected-foreground "black")
                  (selected-background "lightblue")
@@ -208,7 +208,7 @@
                  (size 10)
                  min max
                  label
-                 label-style
+                 (label-style "")
                  slot
                  val-change-cb
                  &allow-other-keys)
@@ -235,7 +235,9 @@
                     css))
             :data-min (or (getf args :min) "false")
             :data-max (or (getf args :max) "false")
-            :label (if label (create-label container :content (ensure-string label) :css '(:margin-right 0) :style label-style)))))
+            :style style))
+         (label (if label (create-label container :content (ensure-string label) :css '(:margin-right 0) :style label-style))))
+    (declare (ignorable label))
 ;;;    (clog::unbind-event-script numbox "onmousedown")
      (js-execute numbox (format nil "numbox(~A)" (jquery numbox)))
      (if val-change-cb
@@ -247,56 +249,54 @@
                                 (funcall val-change-cb val-string numbox))))))    
     numbox))
 
+
+
 (defmethod text-value ((obj clog-progress-bar))
   (property obj "value"))
 
 (defmethod (setf text-value) (value (obj clog-progress-bar))
   (setf (property obj "value") value))
 
-
-(defun toggle (container &key (style "") (content "") (size 6)
-                           (color "black")
-                           (background "white")
-                           (selected-foreground "black")
-                           (selected-background "orange")
-                           (value-off "0.0")
-                           (value-on "1.0")
-                           val-change-cb (toggle-content "")
-                           slot)
-  (declare (ignore slot))
-  (let ((btn (create-button container :class "toggle"
-                                   :style (format nil "~A width: ~A;height: ~Apx;font-size: ~Apt;color: ~A;background-color: ~A;"
-                                                     style (* 5 size) (* 2 size) size color background)
-                                   :content content
-                                   :data-val "0.0")))
+(defun toggle (container &rest args
+               &key (style "") (size 10)
+                 (color "black")
+                 (background "white")
+                 (selected-foreground "black")
+                 (selected-background "orange")
+                 (value-off "0")
+                 (value-on "1")
+                 (value 0)
+                 val-change-cb
+                 (label-off "") (label-on "")
+                 &allow-other-keys)
+  (let* ((css (getf args :css))
+         (btn (clog::create-button
+                     container
+                     :class "toggle"
+                     :css (append
+                           `(:color ,color
+                             :align center
+                             :background-color (or (getf args :background-color) ,background)
+                             :--textbox-selected-foreground ,selected-foreground
+                             :--textbox-selected-background ,selected-background
+                             :font-size ,(addpx size)
+                             :width ,(or (getf css :width) (addpx (* size 5)))
+                             :height ,(or (getf css :height) (addpx (* size 1.7))))
+                           (progn
+                             (dolist (prop '(:width :height)) (remf args prop))
+                             css))
+                     :data-val value
+                     :style style)))
     (let ((str (format nil "toggle(~A, { \"colorOff\": '~(~a~)', \"backgroundOff\": '~(~a~)', \"labelOff\": '~(~a~)', \"valueOff\": '~(~a~)', \"colorOn\": '~(~a~)', \"backgroundOn\": '~(~a~)', \"labelOn\": '~(~a~)', \"valueOn\": '~(~a~)'})"
-                            (jquery btn) color background content value-off selected-foreground selected-background toggle-content value-on)))
-;;;      (break "~S" str)
+                            (jquery btn) color background label-off value-off selected-foreground selected-background label-on value-on)))
       (js-execute btn str))
-    (set-on-click
-     btn
-     (lambda (obj)
-       (declare (ignore obj))
-       (let ((new-val (if (equal (attribute btn "data-val") value-on)
-                           value-off value-on)))
-         (setf (attribute btn "data-val") new-val)         
-         (if val-change-cb (funcall val-change-cb new-val btn)))))
-;;     (set-on-mouse-down
-;;      btn
-;;      (lambda (obj event)
-;;        (declare (ignore obj event))
-;; ;;;       (setf mouse-down t)
-;;        (if button-state
-;;            (progn
-;;              ;; (setf (style obj "color") color)
-;;              ;; (setf (style obj "background-color") background)
-;;              ;; (setf (text obj) content)
-;;              )
-;;            (progn
-;;              ;; (setf (style obj "color") selected-foreground)
-;;              ;; (setf (style obj "background-color") selected-background)
-;;              ;; (if toggle-content (setf (text obj) toggle-content))
-;;              ))))
+    (if val-change-cb
+        (progn
+          (clog::set-event btn "valuechange"
+                           (lambda (data)
+                             (declare (ignore data))
+                             (let ((val (read-from-string (attribute btn "value"))))
+                               (funcall val-change-cb val btn))))))
     btn))
 
 (deftype vu-type () '(member :led :bar))
