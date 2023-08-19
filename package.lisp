@@ -25,6 +25,8 @@
            #:vslider #:hslider
            #:multi-slider
            #:toggle
+           #:radio
+           #:vradio #:hradio
            #:numbox
            #:vumeter
            #:multi-vu

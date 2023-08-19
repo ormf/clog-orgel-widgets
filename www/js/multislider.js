@@ -31,7 +31,7 @@ function multislider(elem, config) {
     var multislider = elem.get(0);
     var numSliders = multislider.getAttribute('data-num-sliders');
 //    var colors = JSON.parse(multislider.getAttribute('data-colors'));
-    var colors    = config.colors ? JSON.parse(config.colors) : ['lightblue'];
+    var colors    = config.colors || ['lightblue'];
     var numColors = colors.length;
     var offsetTop = multislider.offsetTop;
     var offsetLeft = multislider.offsetLeft;

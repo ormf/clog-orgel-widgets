@@ -50,7 +50,16 @@
                                                  :padding-bottom 30px))))
 ;;;      (toggle gui-container)
 
-      (toggle gui-container :css '(:margin 10px :width 17px)
+      (radio gui-container :css '(:margin 10px :height 17px)
+                           :background-off "transparent"
+                           :label-off (loop for n below 8 collect n)
+                           :label-on (loop for n below 8 collect n)
+                           :val-change-cb (lambda (v obj)
+                                            (declare (ignore obj))
+                                            (format t "radio: ~a~%" v)))
+      (radio gui-container :css '(:margin 10px :height 17px)
+             :background-off "transparent")
+      (toggle gui-container :css '(:margin 10px :height 17px)
                             :background "transparent"
                             :val-change-cb (lambda (x obj)
                                              (declare (ignore obj))

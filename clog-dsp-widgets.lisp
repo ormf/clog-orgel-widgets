@@ -34,6 +34,16 @@
     (clog::connection-id elem)
     clog-connection::*connection-data*)))
 
+(defun ensure-list (arg)
+  (typecase arg
+    (string (list arg))
+    (vector (coerce arg 'list))
+    (list arg)
+    (t (list arg))))
+
+;;; (ensure-list "")
+;;; (ensure-list #(1 2 3))
+
 (defun ensure-string (token)
   (if (stringp token) token (format nil "~S" token)))
 
@@ -46,10 +56,26 @@
    (ash (logand num #xff00) -8)
    (logand num #xff)))
 
-(defun cols->jsarray (cols)
+(defun list->js-array (list)
   "transform a list of hex value colors into a javascript string"
-  (format nil "[~{'rgba(~{~a~^, ~}, 1.0)'~^, ~}]" (mapcar #'hex->rgb cols)))
+  (format nil "[~{'~a'~^, ~}]" list))
 
+;;; (list->js-array '("blue" "green" "red"))  "['blue', 'green', 'red']"
+
+(defun colors->js-strings (colors)
+  "transform a list of colors to valid js strings"
+  (mapcar (lambda (color) (typecase color
+                       (number (format nil "rgba(~{~a~^, ~}, 1.0)" (hex->rgb color)))
+                       (symbol (format nil "~(~a~)" color))
+                       (t color)))
+          colors))
+
+(defun colors->js-array (colors)
+  (list->js-array
+   (colors->js-strings (ensure-list colors))))
+
+(defun any->js-array (colors)
+  (list->js-array (ensure-list colors)))
 #|
 (defun hslider
     (container &key (value 0.0) (min 0.0) (max 100.0) (thumbcolor "black") (color "#3071A9")
@@ -146,25 +172,26 @@
     (remf args :sliderclass)
     (slider-template slider-class nil nil)))
 
+;;; (colors->js-array '("blue" "green" "red"))
 
 (defun multi-slider (container &rest args
-                     &key (num 8) (colors #("blue" "green" "red"))
+                     &key (num 8) (colors '("blue" "green" "red"))
                        (min 0) (max 1) (mapping :lin)
                        (clip-zero nil)
                        (thumb t)
                        (direction "up") val-change-cb
                       &allow-other-keys)
   (let* ((css (getf args :css))
-         (data-colors (format nil "'[~{\"~a\"~^, ~}]'" (coerce (or (getf args :colors) colors) 'list)))
+         (data-colors (colors->js-array (or (getf args :colors) colors)))
          (msl (create-div container
                           :class "multislider"
                           :css (append
                                 `(:color "transparent"
+                                  :background "transparent"
                                   :border "none"
                                   :display "flex"
                                   :padding "0.5pt")
                                 css
-                                '(:background-color "transparent")
                                 (unless (getf css :height) `(:height ,*default-vslider-height*))
                                 (unless (getf css :width) `(:width ,(format nil "~apx" (* num 17)))))
                           :data-num-sliders num
@@ -249,8 +276,6 @@
                                 (funcall val-change-cb val-string numbox))))))    
     numbox))
 
-
-
 (defmethod text-value ((obj clog-progress-bar))
   (property obj "value"))
 
@@ -259,27 +284,28 @@
 
 (defun toggle (container &rest args
                &key (style "") (size 10)
-                 (color "black")
-                 (background "white")
-                 (selected-foreground "black")
-                 (selected-background "orange")
+                 (text-color-off "black")
+                 (background-off "white")
+                 (label-off "")
+                 (text-color-on "black")
+                 (background-on "orange")
+                 (label-on "")
                  (value-off "0")
                  (value-on "1")
                  (value 0)
                  val-change-cb
-                 (label-off "") (label-on "")
                  &allow-other-keys)
   (let* ((css (getf args :css))
-         (background (or (getf args :background-color) background))
+         (background-off (or (getf args :background-color) (getf args :background) background-off))
          (btn (clog::create-button
                      container
                      :class "toggle"
                      :css (append
-                           `(:color ,color
-                             :align center
-                             :background ,background
-                             :--textbox-selected-foreground ,selected-foreground
-                             :--textbox-selected-background ,selected-background
+                           `(:align center
+;;                             :color ,text-color-off
+;;                             :background ,background-off
+                             :--textbox-selected-foreground ,text-color-on
+                             :--textbox-selected-background ,background-on
                              :font-size ,(addpx size)
                              :width ,(or (getf css :width) (addpx (* size 5)))
                              :height ,(or (getf css :height) (addpx (* size 1.7))))
@@ -288,8 +314,17 @@
                              css))
                      :data-val value
                      :style style)))
-    (let ((str (format nil "toggle(~A, { \"colorOff\": '~(~a~)', \"backgroundOff\": '~(~a~)', \"labelOff\": '~(~a~)', \"valueOff\": '~(~a~)', \"colorOn\": '~(~a~)', \"backgroundOn\": '~(~a~)', \"labelOn\": '~(~a~)', \"valueOn\": '~(~a~)'})"
-                            (jquery btn) color background label-off value-off selected-foreground selected-background label-on value-on)))
+    (let ((str (format nil "toggle(~A, { ~{~{'~a': '~(~a~)'~}~^, ~} })"
+                       (jquery btn)
+                       `(("colorOff" ,text-color-off)
+                         ("backgroundOff" ,background-off)
+                         ("labelOff" ,label-off)
+                         ("valueOff" ,value-off)
+                         ("colorOn" ,text-color-on)
+                         ("backgroundOn" ,background-on)
+                         ("labelOn" ,label-on)
+                         ("valueOn" ,value-on)))))
+;;      (break "~S" str)
       (js-execute btn str))
     (if val-change-cb
         (progn
@@ -299,6 +334,53 @@
                              (let ((val (read-from-string (attribute btn "data-val"))))
                                (funcall val-change-cb val btn))))))
     btn))
+
+(defun radio (container &rest args
+              &key (style "")
+                (num 8)
+                (text-color-off "black")
+                (background-off "white")
+                (label-off "")
+                (text-color-on "black")
+                (background-on "orange")
+                (label-on "")
+                (value 0)
+                (direction "right")
+                val-change-cb
+              &allow-other-keys)
+  (let* ((css (getf args :css))
+         (radio (clog::create-div
+                 container
+                 :class "radio"
+                 :css (append
+                       `(:color "transparent"
+                         :background "transparent"
+                         :border "none"
+                         :padding "0.5pt")
+                       css
+                       (unless (getf css :height) `(:height ,*default-vslider-height*))
+                       (unless (getf css :width) `(:width ,(format nil "~apx" (* num 17)))))
+                 :data-num num
+                 :data-val value
+                 :style style)))
+    (let* ((str (format nil "radio(~A, { ~{~{'~a': ~(~a~)~}~^, ~} })"
+                        (jquery radio)
+                        `(("colorOff" ,(colors->js-array text-color-off))
+                          ("backgroundOff" ,(colors->js-array background-off))
+                          ("labelOff" ,(any->js-array label-off))
+                          ("colorOn" ,(colors->js-array text-color-on))
+                          ("backgroundOn" ,(colors->js-array background-on))
+                          ("labelOn" ,(any->js-array label-on))
+                          ("direction" ,(format nil "'~a'" direction))))))
+      (js-execute radio str))
+    (if val-change-cb
+        (progn
+          (clog::set-event radio "valuechange"
+                           (lambda (data)
+                             (declare (ignore data))
+                             (let ((val (read-from-string (attribute radio "data-val"))))
+                               (funcall val-change-cb val radio))))))
+    radio))
 
 (deftype vu-type () '(member :led :bar))
 (deftype vu-input-mode () '(member :db :lin))
@@ -329,7 +411,7 @@
                                           \"inputMode\": '~(~a~)', \"displayMap\": '~(~a~)', \"direction\": '~(~a~)',
                                           \"innerPadding\": '~(~a~)', \"innerPaddingBottom\": '~(~a~)'})"
                                   (jquery vu-container)
-                                  (if led-colors (if (symbolp led-colors) (format nil "\"~(~a~)\"" led-colors) (cols->jsarray led-colors)) "false")
+                                  (if led-colors (if (symbolp led-colors) (format nil "\"~(~a~)\"" led-colors) (colors->js-array led-colors)) "false")
                                   bar-color
                                   vu-type input-mode display-map direction
                                   (or inner-padding "false")
