@@ -43,9 +43,9 @@ function multislider(elem, config) {
     var mouseDownListener, mouseMoveListener;
     var sliders;
     var sliderType; // mvslider or mhslider, depending on direction
-    var getXFrac, getYFrac;  // functions for calculating the
-                             // X/YFraction on mousemove depending on
-                             // direction of the sliders.
+    var getFraction, getIdxFraction;  // functions for calculating the
+                                  // Fractions on mousemove depending on
+                                  // direction of the sliders.
     var innerBorder;     // we set one of the borders between the
                          // sliders to none except for the border of
     // the first slider. Depending on the direction of the sliders,
@@ -138,24 +138,22 @@ function multislider(elem, config) {
         return ((val - minValue) / valueRange);
     }
 
-    function getYFraction (clientY) {
-        let localYFrac = (multisliderHeight + multislider.offsetTop - clientY) / multisliderHeight;
+    function getYFraction (event) {
+        let localYFrac = (multisliderHeight + multislider.offsetTop - event.clientY) / multisliderHeight;
         return clamp(localYFrac, 0, 1);
     }
 
-    function getXFraction (clientX) {
-        let localXFrac = ((clientX - multislider.offsetLeft)) / multisliderWidth;
+    function getXFraction (event) {
+        let localXFrac = ((event.clientX - multislider.offsetLeft)) / multisliderWidth;
         return clamp(localXFrac, 0, 1);
     }
 
-    function getYFractionRev (clientY) {
-        let localYFrac = (1 - (multisliderHeight + multislider.offsetTop - clientY) / multisliderHeight);
-        return clamp(localYFrac, 0, 1);
+    function getYFractionRev (event) {
+        return (1 - getYFraction(event));
     }
 
-    function getXFractionRev (clientX) {
-        let localXFrac = (1 - ((clientX - multislider.offsetLeft)) / multisliderWidth);
-        return clamp(localXFrac, 0, 1);
+    function getXFractionRev (event) {
+        return (1 - getXFraction(event));
     }
 
     function setDirection () {
@@ -163,37 +161,29 @@ function multislider(elem, config) {
         switch (direction) {
         case 'right':
             sliderType = 'mhslider';
-            getXFrac = getXFraction;
-            getYFrac = getYFractionRev;
             innerBorder = 'border-top';
             multislider.style.flexDirection = "column";
-            mouseMoveListener = mouseMoveListenerX;
-            mouseDownListener = mouseDownListenerX;
+            getFraction = getXFraction;
+            getIdxFraction = getYFractionRev;
             break;
         case 'left':
             sliderType = 'mhslider';
-            getXFrac = getXFraction;
-            getYFrac = getYFractionRev;
             innerBorder = 'border-top';
             multislider.style.flexDirection = "column";
-            mouseMoveListener = mouseMoveListenerX;
-            mouseDownListener = mouseDownListenerX;
+            getFraction = getXFractionRev;
+            getIdxFraction = getYFractionRev;
             break;
         case 'down':
             sliderType = 'mvslider';
-            getXFrac = getXFraction;
-            getYFrac = getYFraction;
             innerBorder = 'border-left';
-            mouseMoveListener = mouseMoveListenerY;
-            mouseDownListener = mouseDownListenerY;
+            getFraction = getYFractionRev;
+            getIdxFraction = getXFraction;
             break;
         default: // 'up'
             sliderType = 'mvslider';
-            getXFrac = getXFraction;
-            getYFrac = getYFraction;
             innerBorder = 'border-left';
-            mouseMoveListener = mouseMoveListenerY;
-            mouseDownListener = mouseDownListenerY;
+            getFraction = getYFraction;
+            getIdxFraction = getXFraction;
         }
     }
 
@@ -203,28 +193,14 @@ function multislider(elem, config) {
     var lastIdx = false;
     var lastFraction = false;
     
-    function mouseDownListenerY (event) {
+    function mouseDownListener (event) {
         moved = false;
-        let YFraction = getYFrac(event.clientY);
-        let XFraction = getXFrac(event.clientX);
-        idx = Math.floor(getXFrac(event.clientX)*numSliders);
+        let idxFraction = getIdxFraction(event);
+        let valFraction = getFraction(event);
+        idx = Math.floor(idxFraction*numSliders);
         if (idx >= numSliders) idx = numSliders - 1;
-        sliders[idx].setBarSize(YFraction);
-        lastFraction = YFraction;
-        lastIdx = idx;
-        document.addEventListener('mousemove', mouseMoveListener);
-        document.addEventListener('mouseup', mouseUpListener);
-    }
-
-
-    function mouseDownListenerX (event) {
-        moved = false;
-        let YFraction = getYFrac(event.clientY);
-        let XFraction = getXFrac(event.clientX);
-        idx = Math.floor(getYFrac(event.clientY)*numSliders);
-        if (idx >= numSliders) idx = numSliders - 1;
-        sliders[idx].setBarSize(XFraction);
-        lastFraction = YFraction;
+        sliders[idx].setBarSize(valFraction);
+        lastFraction = valFraction;
         lastIdx = idx;
         document.addEventListener('mousemove', mouseMoveListener);
         document.addEventListener('mouseup', mouseUpListener);
@@ -251,29 +227,15 @@ function multislider(elem, config) {
         else sliders[idx].setBarSize(fraction);
     }
     
-    function mouseMoveListenerY (event) {
+    function mouseMoveListener (event) {
         moved = true;
-        let YFraction = getYFrac(event.clientY);
-        let XFraction = getXFrac(event.clientX);
-        idx = Math.floor(getXFrac(event.clientX)*numSliders);
+        let valFraction = getFraction(event);
+        let idxFraction = getIdxFraction(event);
+        idx = Math.floor(idxFraction*numSliders);
         if (idx >= numSliders) idx = numSliders - 1;
-//        console.log('mouseMoveListener' + idx + ' ' + lastIdx + ' ' + YFraction + ' ' + lastFraction);
-        if ((idx != lastIdx) || (YFraction != lastFraction)) {
-            interpolateSetBarSize(idx, YFraction);
-            lastFraction = YFraction;
-            lastIdx = idx;
-        }
-    }
-
-    function mouseMoveListenerX (event) {
-        moved = true;
-        let YFraction = getYFrac(event.clientY);
-        let XFraction = getXFrac(event.clientX);
-        idx = Math.floor(getYFrac(event.clientY)*numSliders);
-        if (idx >= numSliders) idx = numSliders - 1;
-        if ((idx != lastIdx) || (XFraction != lastFraction)) {
-            interpolateSetBarSize(idx, XFraction);
-            lastFraction = XFraction;
+        if ((idx != lastIdx) || (valFraction != lastFraction)) {
+            interpolateSetBarSize(idx, valFraction);
+            lastFraction = valFraction;
             lastIdx = idx;
         }
     }
@@ -293,7 +255,6 @@ function multislider(elem, config) {
         multislider.sliders = multislider.sliders;
         multislider.colors = colors;
         multislider.addEventListener('mousedown', mouseDownListener);
-
     }
 
     init();
