@@ -74,6 +74,9 @@ function slider(elem, config){
     var thumbColor = style.getPropertyValue('--thumb-color');
     var barColor = style.getPropertyValue('--bar-color');
 
+    var getFraction;
+    var calcBarSize;;
+
     function clamp(number, min, max) {
         return Math.max(min, Math.min(number, max));
     }
@@ -84,14 +87,22 @@ function slider(elem, config){
         return ((val - minValue) / valueRange);
     }
 
-    function getYFraction (clientY) {
-        let localYFrac = (sliderHeight + slider.offsetTop - clientY) / sliderHeight;
+    function getYFraction (event) {
+        let localYFrac = (sliderHeight + slider.offsetTop - event.clientY) / sliderHeight;
         return clamp(localYFrac, 0, 1);
     }
 
-    function getXFraction (clientX) {
-        let localXFrac = ((clientX - slider.offsetLeft)) / sliderWidth;
+    function getYFractionRev (event) {
+        return (1 - getYFraction(event));
+    }
+
+    function getXFraction (event) {
+        let localXFrac = ((event.clientX - slider.offsetLeft)) / sliderWidth;
         return clamp(localXFrac, 0, 1);
+    }
+
+    function getXFractionRev (event) {
+        return (1 - getXFraction(event));
     }
 
     function calcBarHeight (YFraction) {
@@ -102,24 +113,8 @@ function slider(elem, config){
         }
     }
 
-    function calcBarHeightRev (YFraction) {
-        let newBarSize = ((1 - YFraction) * (sliderHeight - thumbWidth)) + 'px';
-        if (newBarSize != oldBarSize) {
-            oldBarSize = newBarSize;
-            sliderBar.style.height = newBarSize;
-        }
-    }
-
-    function calcBarWidth (YFraction) {
-        let newBarSize = (YFraction * (sliderWidth - thumbWidth)) + 'px';
-        if (newBarSize != oldBarSize) {
-            oldBarSize = newBarSize;
-            sliderBar.style.width = newBarSize;
-        }
-    }
-
-    function calcBarWidthRev (YFraction) {
-        let newBarSize = ((1 - YFraction) * (sliderWidth - thumbWidth)) + 'px';
+    function calcBarWidth (XFraction) {
+        let newBarSize = (XFraction * (sliderWidth - thumbWidth)) + 'px';
         if (newBarSize != oldBarSize) {
             oldBarSize = newBarSize;
             sliderBar.style.width = newBarSize;
@@ -129,7 +124,6 @@ function slider(elem, config){
     function linVal (frac) { // frac -> val
         return (minValue + (frac * valueRange));
     }
-
 
     function linValRev (val) { // val -> frac
         return ((val - minValue)/ valueRange);
@@ -220,7 +214,7 @@ function slider(elem, config){
                 sliderBar.style.borderBottom = 'none';
             }
             calcBarSize = calcBarWidth;
-            mouseMoveListener = mouseMoveListenerX;
+            getFraction = getXFraction;
             break;
         case 'left':
             sliderBar.style.height = '100%';
@@ -236,8 +230,8 @@ function slider(elem, config){
                 sliderBar.style.borderTop = 'none';
                 sliderBar.style.borderBottom = 'none';
             }
-            calcBarSize = calcBarWidthRev;
-            mouseMoveListener = mouseMoveListenerX;
+            calcBarSize = calcBarWidth;
+            getFraction = getXFractionRev;
             break;
         case 'down':
             sliderBar.style.width = '100%';
@@ -253,8 +247,8 @@ function slider(elem, config){
                 sliderBar.style.borderTop = 'none';
                 sliderBar.style.borderBottom = (sliderHeight/41) + 'px solid ' + thumbColor;
             }
-            calcBarSize = calcBarHeightRev;
-            mouseMoveListener = mouseMoveListenerY;
+            calcBarSize = calcBarHeight;
+            getFraction = getYFractionRev;
             break;
         default: // 'up'
             sliderBar.style.width = '100%';
@@ -271,7 +265,7 @@ function slider(elem, config){
                 sliderBar.style.borderBottom = 'none';
             }
             calcBarSize = calcBarHeight;
-            mouseMoveListener = mouseMoveListenerY;
+            getFraction = getYFraction;
         }
     }
 
@@ -334,16 +328,12 @@ function slider(elem, config){
         document.addEventListener('mouseup', mouseUpListener);
     }
 
-    function mouseMoveListenerY (event) {
+    function mouseMoveListener (event) {
         moved = true;
-        slider.setBarSize(getYFraction(event.clientY));
+        console.log('fraction: ', getFraction(event));
+        slider.setBarSize(getFraction(event));
     }
     
-    function mouseMoveListenerX (event) {
-        moved = true;
-        slider.setBarSize(getYFraction(event.clientX));
-    }
-
     function mouseUpListener (event){
         document.removeEventListener('mousemove', mouseMoveListener);
         document.removeEventListener('mouseup', mouseUpListener);

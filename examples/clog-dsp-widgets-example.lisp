@@ -59,14 +59,6 @@
                                             (declare (ignore obj))
                                             (format t "radio: ~a~%" v)))
       (radio gui-container :css '(:margin 10px :width 17px :height 136px)
-                           :background-off '("#666" "#999")
-                           :label-off (loop for n below 8 collect n)
-                           :label-on (loop for n below 8 collect n)
-                           :direction "up"
-                           :val-change-cb (lambda (v obj)
-                                            (declare (ignore obj))
-                                            (format t "radio: ~a~%" v)))
-      (radio gui-container :css '(:margin 10px :width 17px :height 136px)
                                  :background-off '("#666" "#999")
                            :label-off (loop for n below 8 collect n)
                            :label-on (loop for n below 8 collect n)
@@ -79,6 +71,15 @@
                            :label-off (loop for n below 8 collect n)
                            :label-on (loop for n below 8 collect n)
                            :direction "left"
+                           :val-change-cb (lambda (v obj)
+                                            (declare (ignore obj))
+                                            (format t "radio: ~a~%" v)))
+
+      (radio gui-container :css '(:margin 10px :width 17px :height 136px)
+                           :background-off '("#666" "#999")
+                           :label-off (loop for n below 8 collect n)
+                           :label-on (loop for n below 8 collect n)
+                           :direction "up"
                            :val-change-cb (lambda (v obj)
                                             (declare (ignore obj))
                                             (format t "radio: ~a~%" v)))
@@ -112,12 +113,12 @@
       ;; (vslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "lightblue" :--bar-color "lightgreen" :--thumb-color "red") :value 0.90)
       (vslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "lightblue" :--bar-color "#555" :--thumb-color "red") :value 0.90 :direction "up"
                              :val-change-cb (lambda (val obj) (declare (ignore obj)) (format t "value changed: ~a~%" val)))
-      ;; (vslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "lightblue" :--bar-color "#555" :--thumb-color "red") :value 0.90 :direction "down"
-      ;;                              :val-change-cb (lambda (val obj) (declare (ignore obj)) (format t "value changed: ~a~%" val)))
-      ;; (hslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "lightblue" :--bar-color "#555" :--thumb-color "red") :value 0.90 :direction "right"
-      ;;                        :val-change-cb (lambda (val obj) (declare (ignore obj)) (format t "value changed: ~a~%" val)))
-      ;; (hslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "lightblue" :--bar-color "#555" :--thumb-color "red") :value 0.90 :direction "left"
-      ;;                        :val-change-cb (lambda (val obj) (declare (ignore obj)) (format t "value changed: ~a~%" val)))
+      (vslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "lightblue" :--bar-color "#555" :--thumb-color "red") :value 0.90 :direction "down"
+                                   :val-change-cb (lambda (val obj) (declare (ignore obj)) (format t "value changed: ~a~%" val)))
+      (hslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "lightblue" :--bar-color "#555" :--thumb-color "red") :value 0.90 :direction "right"
+                             :val-change-cb (lambda (val obj) (declare (ignore obj)) (format t "value changed: ~a~%" val)))
+      (hslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "lightblue" :--bar-color "#555" :--thumb-color "red") :value 0.90 :direction "left"
+                             :val-change-cb (lambda (val obj) (declare (ignore obj)) (format t "value changed: ~a~%" val)))
       
       ;; (hslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "transparent" :--bar-color "lightblue")
       ;;                        :value 0.2 :thumb nil :mapping :log :clip-zero t)
