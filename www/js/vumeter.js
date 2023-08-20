@@ -5,7 +5,7 @@ function vumeter(elem, config){
     var boxCount        = config.boxCount || 40;
     var ledColors       = config.ledColors || 'green';
     var barColor        = config.barColor || 'rgba(60,60,255,1.0)';
-    var vuType          = config.type || 'led';
+    var vuType          = config.vuType || 'led';
     var ledMapping      = config.ledMapping || 'db-lin';
     var vuDirection     = config.direction || 'up';
     var vuInnerPadding = config.innerPadding || '2px';
@@ -115,31 +115,35 @@ function vumeter(elem, config){
 
 
     function createBar (parent) {
-        let vuBar = document.createElement("div");
+        createLedContainer(parent);
+        let vuBar = document.createElement("span");
         vuBar.style.height = "100%";
         vuBar.style.width = "100%";
-        vuBar.style.padding = "2px";
+//        vuBar.style.border = "thin solid var(--vu-background)";
+        vuBar.style.border = "thin solid var(--vu-background)";
+        vuBar.style.backgroundColor = "var(--vu-background)";
 //        vuBar.style.display = "flex";
 //        vuBar.style.flexDirection = "column";
 //        vuBar.style.justifyContent = "space-between";
-        vuBar.style.padding = vuInnerPadding;
-        vuBar.style.paddingBottom = vuInnerPaddingBottom;
-        parent.appendChild(vuBar);
+        parent.ledContainer.appendChild(vuBar);
         parent.vuBar = vuBar;
 
     }
 
     function setBarSizeY(db) {
-        vuMeter.vuBar.style.height = (db/112)*vuHeight;
+        console.log(((db/112)*vuHeight) + 'px');
+        vuMeter.vuBar.style.height = ((db/112)*vuHeight) + 'px';
     }
     
     function setBarSizeX(db) {
-        vuMeter.vuBar.style.width = (db/112)*vuWidth;
+        vuMeter.vuBar.style.width = ((db/112)*vuWidth) + 'px';
     }
     
     function drawBar () {
         var targetDB = clamp((100+parseInt(vuMeter.getAttribute("data-db"), 10)), 0, 112);
+        console.log('drawBar!' + targetDB + ' ' + colors[targetDB]);
         setBarSize(targetDB); 
+        vuMeter.vuBar.style.backgroundColor = colors[dbLedIdxLookup[targetDB]];
     }
 
     function drawLed () {
@@ -251,46 +255,63 @@ function vumeter(elem, config){
         }
     }
     
-    function setDirection () {
-
+    function setBarDirection () {
+        switch (vuDirection) {
+        case 'right' :
+            setBarSize = setBarSizeX;
+            vuMeter.ledContainer.style.flexDirection = "row";
+            break;
+        case 'left' :
+            setBarSize = setBarSizeX;
+            vuMeter.ledContainer.style.flexDirection = "row-reverse";
+            break;
+        case 'down' :
+            setBarSize = setBarSizeY;
+            vuMeter.ledContainer.style.flexDirection = "column";
+            break;
+        default : // 'up'
+            setBarSize = setBarSizeY;
+            vuMeter.ledContainer.style.flexDirection = "column-reverse";
+            break;
+        }
     }
 
     function init() {
         vuMeter.style.background = 'var(--vu-background)';
-        vuHeight = style.height;
-        vuWidth = style.width;
-        console.log('height: ' + vuHeight + 'width: ' + vuWidth);
+        vuHeight = parseFloat(style.height);
+        vuWidth = parseFloat(style.width);
+        console.log('height: ' + vuHeight + ', width: ' + vuWidth + ' ' + vuType);
+        switch (ledColors) {
+        case "green":
+            setGreenColors();
+            break;
+        case "blue":
+            setBlueColors();
+            break;
+        case "pd":
+            setPdColors();
+            break;
+        default:
+            if (ledColors.length == 14) {
+                setCustomColors(ledColors);
+            }
+            else setGreenColors();
+            break;
+        }
+        setLedMapping();
         switch(vuType) {
         case 'led' :
             console.log('ledColors: ' + ledColors);
             drawVu = drawLed;
             createLeds(vuMeter);
-            setLedMapping();
-            switch (ledColors) {
-            case "green":
-                setGreenColors();
-                break;
-            case "blue":
-                setBlueColors();
-                break;
-            case "pd":
-                setPdColors();
-                break;
-            default:
-                if (ledColors.length == 14) {
-                    setCustomColors(ledColors);
-                }
-                else setGreenColors();
-                break;
-            }
             break;
         case 'bar' :
             console.log('drawBar: ' + ledColors);
+            createBar(vuMeter);
+            setBarDirection();
             drawVu = drawBar;
-            createLeds(vuMeter);
             break;
         }
-        setDirection();
         drawVu();
     }
     

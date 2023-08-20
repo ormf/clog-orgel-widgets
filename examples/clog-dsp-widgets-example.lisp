@@ -50,8 +50,13 @@
                                                     :margin-right 15px
                                                     :padding-bottom 30px))))
 
+      (vumeter gui-container :css '(:margin 10px)
+                             :data-db db
+                             :display-map :pd
+                             :led-colors :pd)
       (setf *my-vumeter* (vumeter gui-container :css '(:margin 10px)
                                                 :data-db db
+                                                :vu-type :bar
                                                 :display-map :pd
                                                 :led-colors :pd))
       (vumeter gui-container :css '(:margin 10px)
