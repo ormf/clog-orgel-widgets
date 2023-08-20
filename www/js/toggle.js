@@ -124,6 +124,8 @@ function radio (elem, config) {
     const valChangeEvent = new Event("valuechange");
     var innerBorder, mouseDownListener, oldValue;
 
+    var getFraction;
+
     var externalValueChange = true;
     
     var style = window.getComputedStyle(myRadio, null);
@@ -157,10 +159,11 @@ function radio (elem, config) {
         for (let i = 0; i < num; i++) {
             let currToggle = makeToggle();
             parent.appendChild(currToggle);
-            idx = ((direction == 'up') || (direction == 'left'))? (num - i -1) : i;
+            idx = ((direction == 'up') || (direction == 'left'))? (num - i - 1) : i;
             currToggle.setAttribute('data-idx', idx);
+            console.log('innerBorder: ', innerBorder);
             if (i > 0) currToggle.style.setProperty(innerBorder, 'none');
-            toggles[i] = currToggle;
+            toggles[idx] = currToggle;
             toggle(currToggle, { 'colorOff': colorOff[idx%lenColOff],
                                  'backgroundOff': backgroundOff[idx%lenBgOff],
                                  'labelOff': labelOff[idx%lenLbOff],
@@ -180,34 +183,34 @@ function radio (elem, config) {
         return toggles;
     }
 
-    function getYFraction (clientY) {
-        let localYFrac = (myRadio.height + myRadio.offsetTop - clientY) / myRadio.height;
+    function getYFraction (event) {
+        let localYFrac = (myRadio.height + myRadio.offsetTop - event.clientY) / myRadio.height;
         return clamp(localYFrac, 0, 1);
 
     }
 
-    function getXFraction (clientX) {
-        let localXFrac = ((clientX - myRadio.offsetLeft)) / myRadio.width;
+    function getYFractionRev (event) {
+         return (1 - getYFraction(event));
+    }
+
+    function getXFraction (event) {
+        let localXFrac = ((event.clientX - myRadio.offsetLeft)) / myRadio.width;
         return clamp(localXFrac, 0, 1);
     }
 
-    function mouseDownListenerY (event) {
-        moved = false;
-        let YFraction = getYFraction(event.clientY);
-        idx = clamp(Math.floor(YFraction*numButtons), 0, numButtons - 1);
-        externalValueChange = false;
-        myRadio.setAttribute('data-val', idx);
+   function getXFractionRev (event) {
+         return (1 - getXFraction(event));
     }
-
-    function mouseDownListenerX (event) {
-        let XFraction = getXFraction(event.clientX);
-        idx = clamp(Math.floor(XFraction*numButtons), 0, numButtons - 1);
+    
+    function mouseDownListener (event) {
+        moved = false;
+        let Fraction = getFraction(event);
+        idx = clamp(Math.floor(Fraction*numButtons), 0, numButtons - 1);
         externalValueChange = false;
         myRadio.setAttribute('data-val', idx);
     }
 
     function drawRadio (val) {
-//        myRadio.toggles[val]
         myRadio.toggles[oldValue].setAttribute('data-val', 0);
         myRadio.toggles[oldValue].draw(0);
         myRadio.toggles[val].setAttribute('data-val', 1);
@@ -238,28 +241,26 @@ function radio (elem, config) {
         switch (direction) {
         case 'down':
             sliderType = 'vradio';
-            getFrac = getYFraction;
+            getFraction = getYFractionRev;
             innerBorder = 'border-top';
             myRadio.style.flexDirection = "column";
-            mouseDownListener = mouseDownListenerY;
             break;
         case 'up':
+            console.log("up!");
             sliderType = 'vradio';
-            getFrac = getYFraction;
+            getFraction = getYFraction;
             innerBorder = 'border-top';
             myRadio.style.flexDirection = "column";
-            mouseDownListener = mouseDownListenerY;
+            break;
         case 'left':
             sliderType = 'hradio';
-            getFrac = getXFraction;
+            getFraction = getXFractionRev;
             innerBorder = 'border-left';
-            mouseDownListener = mouseDownListenerX;
             break;
         default: // right
             sliderType = 'hradio';
-            getFrac = getXFraction;
+            getFraction = getXFraction;
             innerBorder = 'border-left';
-            mouseDownListener = mouseDownListenerX;
             break;
         }
     }
@@ -274,11 +275,6 @@ function radio (elem, config) {
         myRadio.style.display = 'flex';
         myRadio.addEventListener('mousedown', mouseDownListener);
         myRadio.onselectstart = disable;
-        // myRadio.addEventListener('dblclick', function(event) {
-        //     event.preventDefault();
-        //     event.stopPropagation();
-        // }, true //capturing phase!!
-        //                         );
     }
     
     init();

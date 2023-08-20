@@ -51,13 +51,39 @@
 ;;;      (toggle gui-container)
 
       (radio gui-container :css '(:margin 10px :height 17px)
-                           :background-off "transparent"
+                           :background-off '("#666" "#999")
                            :label-off (loop for n below 8 collect n)
                            :label-on (loop for n below 8 collect n)
+                           :direction "right"
+                           :val-change-cb (lambda (v obj)
+                                            (declare (ignore obj))
+                                            (format t "radio: ~a~%" v)))
+      (radio gui-container :css '(:margin 10px :width 17px :height 136px)
+                           :background-off '("#666" "#999")
+                           :label-off (loop for n below 8 collect n)
+                           :label-on (loop for n below 8 collect n)
+                           :direction "up"
+                           :val-change-cb (lambda (v obj)
+                                            (declare (ignore obj))
+                                            (format t "radio: ~a~%" v)))
+      (radio gui-container :css '(:margin 10px :width 17px :height 136px)
+                                 :background-off '("#666" "#999")
+                           :label-off (loop for n below 8 collect n)
+                           :label-on (loop for n below 8 collect n)
+                           :direction "down"
                            :val-change-cb (lambda (v obj)
                                             (declare (ignore obj))
                                             (format t "radio: ~a~%" v)))
       (radio gui-container :css '(:margin 10px :height 17px)
+                           :background-off '("#666" "#999")
+                           :label-off (loop for n below 8 collect n)
+                           :label-on (loop for n below 8 collect n)
+                           :direction "left"
+                           :val-change-cb (lambda (v obj)
+                                            (declare (ignore obj))
+                                            (format t "radio: ~a~%" v)))
+
+      (radio gui-container :css '(:height 40px :margin 10px)
              :background-off "transparent")
       (toggle gui-container :css '(:margin 10px :height 17px)
                             :background "transparent"
