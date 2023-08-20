@@ -44,13 +44,15 @@ function multislider(elem, config) {
     var sliders;
     var sliderType; // mvslider or mhslider, depending on direction
     var getFraction, getIdxFraction;  // functions for calculating the
-                                  // Fractions on mousemove depending on
-                                  // direction of the sliders.
+                                      // Fractions on mousemove depending on
+                                      // direction of the sliders.
     var innerBorder;     // we set one of the borders between the
                          // sliders to none except for the border of
     // the first slider. Depending on the direction of the sliders,
     // this is either border-top or border-left.
     
+    var style = window.getComputedStyle(multislider, null);
+
     function clamp(number, min, max) {
         return Math.max(min, Math.min(number, max));
     }
@@ -90,8 +92,6 @@ function multislider(elem, config) {
         }
         return sliders;
     }
-
-    var style = window.getComputedStyle(multislider, null);
         
     function setMinMaxMapping() {
         minValue      = parseFloat(multislider.getAttribute("data-min")) || 0.0;

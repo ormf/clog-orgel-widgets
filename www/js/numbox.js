@@ -38,11 +38,6 @@ function numbox(elem){
 
 //    console.log(numbox.getAttribute('value'));
 
-    function disableDrag (elem) {
-        elem.ondragstart = () => { return false; }
-    }
-
-    disableDrag(numbox);
 
     const valChangeEvent = new Event("valuechange");
     const pxRegex = /([0-9]+).*/
@@ -63,7 +58,13 @@ function numbox(elem){
     var selectedForeground = style.getPropertyValue('--textbox-selected-foreground');
     var selectedBackground = style.getPropertyValue('--textbox-selected-background');
 
+    var offsetLeft = numbox.offsetLeft;
+    
     // Utils
+
+        function disableDrag (elem) {
+        elem.ondragstart = () => { return false; }
+    }
     
     function clamp(number, min, max) {
         return Math.max(min, Math.min(number, max));
@@ -159,7 +160,6 @@ function numbox(elem){
             event.preventDefault();
             return false;
         }
-
     }
 
     numbox.setEditing = function () {
@@ -182,7 +182,7 @@ function numbox(elem){
         numbox.value = formatNumBox(number);
         numbox.addEventListener('mousedown', mouseDownListener);
         numbox.removeEventListener('blur', onEditBlurListener);
-            externalValueChange = true;
+        externalValueChange = true;
     }
 
     var currValue;
@@ -209,7 +209,7 @@ function numbox(elem){
             moved = true;
         }
         else { // called while dragging
-            currValue = checkMinMax(lastValue + (lastY - event.clientY) * calcNumScale(event.clientX));
+            currValue = checkMinMax(lastValue + (lastY - event.clientY) * calcNumScale(event.clientX-offsetLeft));
             lastY = event.clientY;
             valString = currValue.toFixed(2); // while dragging truncate to 2 digits after the comma.
             if (valString != lastValue) {
@@ -247,6 +247,7 @@ function numbox(elem){
 // initialization
 
     function init () {
+        disableDrag(numbox);
         numboxHeight = parseFloat(style.height.match(pxRegex)[1]);
         numboxWidth = parseFloat(style.width.match(pxRegex)[1]);
         numbox.addEventListener('mousedown', mouseDownListener);

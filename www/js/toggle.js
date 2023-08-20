@@ -161,7 +161,6 @@ function radio (elem, config) {
             parent.appendChild(currToggle);
             idx = ((direction == 'up') || (direction == 'left'))? (num - i - 1) : i;
             currToggle.setAttribute('data-idx', idx);
-            console.log('innerBorder: ', innerBorder);
             if (i > 0) currToggle.style.setProperty(innerBorder, 'none');
             toggles[idx] = currToggle;
             toggle(currToggle, { 'colorOff': colorOff[idx%lenColOff],
@@ -246,7 +245,6 @@ function radio (elem, config) {
             myRadio.style.flexDirection = "column";
             break;
         case 'up':
-            console.log("up!");
             sliderType = 'vradio';
             getFraction = getYFraction;
             innerBorder = 'border-top';

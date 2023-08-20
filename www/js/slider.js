@@ -330,7 +330,6 @@ function slider(elem, config){
 
     function mouseMoveListener (event) {
         moved = true;
-        console.log('fraction: ', getFraction(event));
         slider.setBarSize(getFraction(event));
     }
     

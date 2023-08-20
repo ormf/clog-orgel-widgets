@@ -3,9 +3,10 @@ function vumeter(elem, config){
     // Settings
     var max             = config.max || 100;
     var boxCount        = config.boxCount || 40;
-    var ledColors       = config.ledColors || [];
+    var ledColors       = config.ledColors || 'green';
     var barColor        = config.barColor || 'rgba(60,60,255,1.0)';
-//    var vuType          = config.type || 0.02;
+    var vuType          = config.type || 'led';
+    var ledMapping      = config.ledMapping || 'db-lin';
     var vuDirection     = config.direction || 'up';
     var vuInnerPadding = config.innerPadding || '2px';
     var vuInnerPaddingBottom = config.innerPaddingBottom || '2px';
@@ -62,73 +63,98 @@ function vumeter(elem, config){
 
     // Derived and starting values
 
-    var colors = [];
+    var colors = new Array(40);
 
+    var vuHeight;
+    var vuWidth;
+    var drawVu;
+    var vuBar;
+    var setBarSize;
+    
     var vuMeter = elem.get(0);
 //    console.log('vuMeter: ' + vuMeter);
 //    console.log('ledColors: ' + ledColors);
 
-    var vuLedContainer = document.createElement("div");
-    vuLedContainer.style.height = "100%";
-    vuLedContainer.style.width = "100%";
-    vuLedContainer.style.padding = "2px";
-    vuLedContainer.style.display = "flex";
-    vuLedContainer.style.flexDirection = "column";
-    vuLedContainer.style.padding = vuInnerPadding;
-    vuLedContainer.style.paddingBottom = vuInnerPaddingBottom;
-    vuLedContainer.style.justifyContent = "space-between";
+    var style = window.getComputedStyle(vuMeter, null);
 
-    vuMeter.appendChild(vuLedContainer);
-        
-    var leds = [];
-    for (i = 39;i>=0;i--) {
-        leds[i] = document.createElement("span");
-        leds[i].style.width = "100%";
-        leds[i].style.height = "100%";
-        leds[i].style.border = "thin solid var(--vu-background)";
-        leds[i].style.backgroundColor = "var(--vu-background)";
-        if (i < 39) { leds[i].style.borderTopStyle = "none"; }
-        vuLedContainer.appendChild(leds[i]);
-    }
-    var lastVal=0;
-    var valLookup = [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 9, 9, 9, 10, 10, 11, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 19, 19, 20, 21, 22, 23, 24, 25, 27, 29, 31, 33, 34, 35, 36, 37, 37, 38, 39, 39, 39, 40];
+    var lastVal = 0;
+    var dbLedIdxLookup;
 
-//    setPdColors();
-//    setBlueColors();
-
-    switch (ledColors) {
-    case "green":
-        setGreenColors();
-        break;
-    case "blue": setBlueColors();
-        break;
-    case "pd":
-        setPdColors();
-    default:
-        if (ledColors.length == 14) {
-            setCustomColors(ledColors);
-        }
-        else setGreenColors();
+    function clamp(number, min, max) {
+        return Math.max(min, Math.min(number, max));
     }
     
-    setPdMap();
+    function createLedContainer (parent) {
+        let vuLedContainer = document.createElement("div");
+        vuLedContainer.style.height = "100%";
+        vuLedContainer.style.width = "100%";
+        vuLedContainer.style.padding = "2px";
+        vuLedContainer.style.display = "flex";
+        vuLedContainer.style.flexDirection = "column";
+        vuLedContainer.style.padding = vuInnerPadding;
+        vuLedContainer.style.paddingBottom = vuInnerPaddingBottom;
+        vuLedContainer.style.justifyContent = "space-between";
+        parent.appendChild(vuLedContainer);
+        parent.ledContainer = vuLedContainer;
+    }
 
-    // Main draw function
-    var drawLed = function() {
-        var targetDB = 100+parseInt(vuMeter.getAttribute("data-db"), 10)
+    function createLeds (parent) {
+        let leds = [];
+        createLedContainer(parent);
+        for (i = 39;i>=0;i--) {
+            leds[i] = document.createElement("span");
+            leds[i].style.width = "100%";
+            leds[i].style.height = "100%";
+            leds[i].style.border = "thin solid var(--vu-background)";
+            leds[i].style.backgroundColor = "var(--vu-background)";
+            if (i < 39) { leds[i].style.borderTopStyle = "none"; }
+            parent.ledContainer.appendChild(leds[i]);
+            parent.leds = leds;
+        }
+    }
 
-        //        console.log('redraw!' + vuMeter.getAttribute("data-db") + ', dB: ' + targetDB);
-        if (targetDB > 112)
-            targetDB=112;
-        else { if (targetVal < 0) tarvetVal = 0; }
+
+    function createBar (parent) {
+        let vuBar = document.createElement("div");
+        vuBar.style.height = "100%";
+        vuBar.style.width = "100%";
+        vuBar.style.padding = "2px";
+//        vuBar.style.display = "flex";
+//        vuBar.style.flexDirection = "column";
+//        vuBar.style.justifyContent = "space-between";
+        vuBar.style.padding = vuInnerPadding;
+        vuBar.style.paddingBottom = vuInnerPaddingBottom;
+        parent.appendChild(vuBar);
+        parent.vuBar = vuBar;
+
+    }
+
+    function setBarSizeY(db) {
+        vuMeter.vuBar.style.height = (db/112)*vuHeight;
+    }
+    
+    function setBarSizeX(db) {
+        vuMeter.vuBar.style.width = (db/112)*vuWidth;
+    }
+    
+    function drawBar () {
+        var targetDB = clamp((100+parseInt(vuMeter.getAttribute("data-db"), 10)), 0, 112);
+        setBarSize(targetDB); 
+    }
+
+    function drawLed () {
+        let leds = vuMeter.leds;
+        var targetDB = clamp((100+parseInt(vuMeter.getAttribute("data-db"), 10)), 0, 112);
+
+//        console.log('redraw! ' + vuMeter.getAttribute("data-db") + ', dB: ' + targetDB);
         
-        var targetVal = valLookup[targetDB];
+        var targetVal = dbLedIdxLookup[targetDB];
 
         if (targetVal != lastVal) {
             if (targetVal > lastVal) {
                 for (var i = lastVal;i < targetVal;i++) {
                     leds[i].style.backgroundColor = colors[i];
-//                    console.log('i: ' + i + ', on: ' + leds[i].style.backgroundColor);
+//                    console.log('i: ' + i + ', on: ' + leds[i].style.backgroundColor + ' ' + colors[i]);
                 }
             }
             else {
@@ -139,26 +165,19 @@ function vumeter(elem, config){
             }
         
             lastVal = targetVal;
-            //        requestAnimationFrame(draw);
         }
     };
-
     
     const mySetAttribute = vuMeter.setAttribute;
     // override setAttribte
-    var setLed = function() {
-        vuMeter.setAttribute = function (key, value) {
-            //        console.log("--trace, key: " + key + ', value: ' + value);
-            // use call, to set the context and prevent illegal invocation errors
-            mySetAttribute.call(vuMeter, key, value);
-            //        if (key == 'data-db') drawBoxes(c, value);
-            if (key == 'data-db') drawLed();
 
+    vuMeter.setAttribute = function (key, value) {
+        mySetAttribute.call(vuMeter, key, value);
+        if (key == 'data-db') {
+            value = clamp(parseFloat(value), 0 , 112).toFixed(0);
+            drawVu();
         }
-        drawLed();
-    };
-
-    setLed();
+    }
 
     function setPdColors () {
         for (i = 0;i<16;i++) { colors[i] = PdGreen; }
@@ -168,13 +187,10 @@ function vumeter(elem, config){
         colors[39] = PdPurple;
     }
 
-    function setPdMap () {
-        valLookup = [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 9, 9, 9, 10, 10, 11, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 19, 19, 20, 21, 22, 23, 24, 25, 27, 29, 31, 33, 34, 35, 36, 37, 37, 38, 39, 39, 39, 40];
-    }
     
     function setBlueColors () {
         for (i = 0;i<1;i++) { colors[i] = colBlue1; }
-        for (i = 1;i<7;i++) { colors[i] = colBlue2; }
+        for (i = 1;i<4;i++) { colors[i] = colBlue2; }
         for (i = 4;i<7;i++) { colors[i] = colBlue3; }
         for (i = 7;i<10;i++) { colors[i] = colBlue4; }
         for (i = 10;i<13;i++) { colors[i] = colBlue5; }
@@ -191,7 +207,7 @@ function vumeter(elem, config){
 
     function setGreenColors () {
         for (i = 0;i<1;i++) { colors[i] = colGreen1; }
-        for (i = 1;i<7;i++) { colors[i] = colGreen2; }
+        for (i = 1;i<4;i++) { colors[i] = colGreen2; }
         for (i = 4;i<7;i++) { colors[i] = colGreen3; }
         for (i = 7;i<10;i++) { colors[i] = colGreen4; }
         for (i = 10;i<13;i++) { colors[i] = colGreen5; }
@@ -223,6 +239,61 @@ function vumeter(elem, config){
         for (i = 37;i<40;i++) { colors[i] = cols[13]; }
      }
 
-        
-    // Trigger the animation
+    function setLedMapping () {
+        console.log('ledMapping: ' + ledMapping);
+        switch (ledMapping) {
+        case 'pd' :
+            dbLedIdxLookup = [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 9, 9, 9, 10, 10, 11, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 19, 19, 20, 21, 22, 23, 24, 25, 27, 29, 31, 33, 34, 35, 36, 37, 37, 38, 39, 39, 39, 40];            
+            break;
+        case 'db-lin' :
+            dbLedIdxLookup = [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 9, 10, 10, 10, 11, 11, 11, 12, 12, 12, 13, 13, 13, 14, 14, 14, 15, 15, 15, 16, 16, 16, 17, 17, 17, 18, 18, 18, 19, 19, 19, 20, 20, 20, 21, 21, 21, 22, 22, 22, 23, 23, 23, 24, 24, 24, 25, 25, 25, 26, 26, 26, 27, 27, 27, 28, 28, 28, 29, 30, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40];
+            break;
+        }
+    }
+    
+    function setDirection () {
+
+    }
+
+    function init() {
+        vuMeter.style.background = 'var(--vu-background)';
+        vuHeight = style.height;
+        vuWidth = style.width;
+        console.log('height: ' + vuHeight + 'width: ' + vuWidth);
+        switch(vuType) {
+        case 'led' :
+            console.log('ledColors: ' + ledColors);
+            drawVu = drawLed;
+            createLeds(vuMeter);
+            setLedMapping();
+            switch (ledColors) {
+            case "green":
+                setGreenColors();
+                break;
+            case "blue":
+                setBlueColors();
+                break;
+            case "pd":
+                setPdColors();
+                break;
+            default:
+                if (ledColors.length == 14) {
+                    setCustomColors(ledColors);
+                }
+                else setGreenColors();
+                break;
+            }
+            break;
+        case 'bar' :
+            console.log('drawBar: ' + ledColors);
+            drawVu = drawBar;
+            createLeds(vuMeter);
+            break;
+        }
+        setDirection();
+        drawVu();
+    }
+    
+    init();
+
 }
