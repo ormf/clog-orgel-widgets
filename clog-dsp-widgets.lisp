@@ -111,7 +111,7 @@
 
 (defmacro slider-template (class slider-length slider-width)
   `(let* ((css (getf args :css))
-          (slider (create-div container
+          (slider (create-slider container
                               :class ,class
                               :css (append
                                     css
@@ -123,7 +123,7 @@
                                     (unless (getf css :background) `(:background ,*default-slider-background-color*))
                                     (unless (getf css :--thumb-color) `(:--thumb-color ,*default-slider-thumb-color*))
                                     (unless (getf css :--bar-color) `(:--bar-color ,*default-slider-bar-color*)))
-                              :data-value value
+                              :data-val value
                               :data-clip-zero clip-zero
                               :data-min min
                               :data-max max
@@ -136,7 +136,7 @@
            (clog::set-event slider "valuechange"
                             (lambda (data)
                               (declare (ignore data))
-                              (let ((val-string (attribute slider "data-value")))
+                              (let ((val-string (attribute slider "data-val")))
                                 (funcall val-change-cb val-string slider))))))
      slider))
 
@@ -183,7 +183,7 @@
                       &allow-other-keys)
   (let* ((css (getf args :css))
          (data-colors (colors->js-array (or (getf args :colors) colors)))
-         (msl (create-div container
+         (msl (create-multislider container
                           :class "multislider"
                           :css (append
                                 `(:color "transparent"
@@ -193,7 +193,7 @@
                                   :padding "0.5pt")
                                 css
                                 (unless (getf css :height) `(:height ,*default-vslider-height*))
-                                (unless (getf css :width) `(:width ,(format nil "~apx" (* num 17)))))
+                                (unless (getf css :width) `(:width ,(format nil "~apx" (* num 10)))))
                           :data-num-sliders num
                           :data-min min
                           :data-max max
@@ -207,18 +207,21 @@
                         )
                     (dotimes (i num)
                       (setf (aref res i)
-                            (create-div msl :data-idx i)))
+                            (create-slider msl :data-idx i)))
                     res)))
     (js-execute msl (format nil "multislider(~A, { \"colors\": ~a, \"thumb\": '~(~a~)'})" (jquery msl) data-colors (if thumb "true" "false")))
-    (dotimes (i num)
-      (let ((slider (aref sliders i)))
-        (clog::set-event slider "valuechange"
-                         (let ((i i))
-                           (lambda (data)
-                             (declare (ignore data))
-                             (let ((val-string (attribute slider "data-value")))
-                               (if val-change-cb (funcall val-change-cb i val-string slider))))))))
-    (values msl sliders)))
+    (setf (sliders msl) sliders)
+    (if val-change-cb
+        (dotimes (i num)
+          (let ((slider (aref sliders i)))
+            (clog::set-event slider "valuechange"
+                             (let ((i i))
+                               (lambda (data)
+                                 (declare (ignore data))
+                                 (let ((val-string (attribute slider "data-val")))
+                                   (if val-change-cb (funcall val-change-cb i val-string slider))))))))
+        (warn "no val-change-cb!"))
+    msl))
 
 (let ((direction "up"))
   (cond 
@@ -232,7 +235,7 @@
                  (selected-foreground "black")
                  (selected-background "lightblue")
                  (value 0)
-                 (size 10)
+                 (size 6)
                  min max
                  label
                  (label-style "")
@@ -244,7 +247,7 @@
          (width (getf css :width))
          (height (getf css :height))
          (numbox
-           (create-form-element
+           (create-numbox
             container :text
             :class "numbox"
             :value value
@@ -297,23 +300,23 @@
                  &allow-other-keys)
   (let* ((css (getf args :css))
          (background-off (or (getf args :background-color) (getf args :background) background-off))
-         (btn (clog::create-button
-                     container
-                     :class "toggle"
-                     :css (append
-                           `(:align center
-;;                             :color ,text-color-off
-;;                             :background ,background-off
-                             :--textbox-selected-foreground ,text-color-on
-                             :--textbox-selected-background ,background-on
-                             :font-size ,(addpx size)
-                             :width ,(or (getf css :width) (addpx (* size 5)))
-                             :height ,(or (getf css :height) (addpx (* size 1.7))))
-                           (progn
-                             (dolist (prop '(:width :height)) (remf args prop))
-                             css))
-                     :data-val value
-                     :style style)))
+         (btn (create-toggle
+               container
+               :class "toggle"
+               :css (append
+                     `(:align center
+                       :color ,text-color-off
+                       :background ,background-off
+                       :--textbox-selected-foreground ,text-color-on
+                       :--textbox-selected-background ,background-on
+                       :font-size ,(addpx size)
+                       :width ,(or (getf css :width) (addpx (* size 5)))
+                       :height ,(or (getf css :height) (addpx (* size 1.7))))
+                     (progn
+                       (dolist (prop '(:width :height)) (remf args prop))
+                       css))
+               :data-val value
+               :style style)))
     (let ((str (format nil "toggle(~A, { ~{~{'~a': '~(~a~)'~}~^, ~} })"
                        (jquery btn)
                        `(("colorOff" ,text-color-off)
@@ -324,7 +327,7 @@
                          ("backgroundOn" ,background-on)
                          ("labelOn" ,label-on)
                          ("valueOn" ,value-on)))))
-;;      (break "~S" str)
+      ;;      (break "~S" str)
       (js-execute btn str))
     (if val-change-cb
         (progn
@@ -349,7 +352,7 @@
                 val-change-cb
               &allow-other-keys)
   (let* ((css (getf args :css))
-         (radio (clog::create-div
+         (radio (create-radio
                  container
                  :class "radio"
                  :css (append
@@ -402,10 +405,12 @@
            (type vu-type vu-type)
            (type vu-input-mode input-mode)
            (type vu-display-map display-map))
-  (format t "ledColors: ~a" led-colors)
-  (when (getf (getf args :css) :background) (setf (getf (getf args :css) :--vu-background) (getf (getf args :css) :background)))
+;;;  (format t "ledColors: ~a~%" led-colors)
+  (when (getf (getf args :css) :background)
+    (setf (getf (getf args :css) :--vu-background)
+          (getf (getf args :css) :background)))
   (let* ((css (getf args :css))
-         (vu-container (create-div
+         (vu-container (create-vumeter
                         container
                         :class "vumeter"
                         :css
@@ -428,6 +433,32 @@
                          ("inputMode" ,(js-string input-mode))
                          ("ledMapping" ,(js-string display-map))
                          ("direction" ,(js-string direction))
-                         ("innerPadding" ,(or inner-padding "false"))
-                         ("innerPaddingBottom" ,(or inner-padding-bottom "false"))))))
-      (js-execute vu-container str))))
+                         ("innerPadding" ,(if inner-padding (js-string inner-padding) "false"))
+                         ("innerPaddingBottom" ,(if inner-padding-bottom (js-string inner-padding-bottom) "false"))))))
+      (js-execute vu-container str)
+      vu-container)))
+
+(defun multi-vu (container &key (num 8) (width 80) (height 100) background (direction :up) (border "")
+                             (inner-background "var(--vu-background)") (inner-border "") inner-padding inner-padding-bottom
+                             led-colors style
+                             val-change-cb)
+  (declare (ignorable val-change-cb))
+  (let* ((mvu (create-multivu container
+                              :style (format nil "color: transparent; background-color: ~a;border: ~a;width: ~Apx;height: ~Apx;display: flex;padding: 0pt;~@[~A~]" (or background "transparent") border width height style)))
+         (vus (loop
+                for n below num
+                collect (vumeter
+                         mvu
+                         :led-colors led-colors
+                         :direction direction
+                         :border inner-border
+                         :data-db 0
+                         :width "100%"
+                         :height "100%"
+                         :border-right-width (if (< n (1- num)) 0 1)
+                         :background (or inner-background background "var(--vu-background)")
+                         :inner-padding inner-padding
+                         :inner-padding-bottom inner-padding-bottom))))
+    (setf (meters mvu) (coerce vus 'vector))
+    mvu))
+

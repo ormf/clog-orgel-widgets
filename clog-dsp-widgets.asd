@@ -12,5 +12,6 @@
   :components ((:file "package")
                (:file "globals")
                (:file "clog-redefs")
+               (:file "classes")
                (:file "clog-dsp-widgets")
                (:file "init")))

@@ -35,6 +35,11 @@
 (in-package :clog-dsp-widgets-example)
 
 (defparameter *my-vumeter* nil)
+(defparameter *my-slider* nil)
+(defparameter *my-toggle* nil)
+(defparameter *my-radio* nil)
+(defparameter *my-numbox* nil)
+(defparameter *my-multislider* nil)
 
 (defun on-new-window (body)
   (clog-dsp-widgets-initialize body)
@@ -46,9 +51,9 @@
   (with-connection-cache (body)
     (let ((db -20)
           (gui-container (create-div body :css '(:display flex
-                                                    :flex-wrap wrap
-                                                    :margin-right 15px
-                                                    :padding-bottom 30px))))
+                                                 :flex-wrap wrap
+                                                 :margin-right 15px
+                                                 :padding-bottom 30px))))
 
       (vumeter gui-container :css '(:margin 10px)
                              :data-db db
@@ -58,7 +63,7 @@
                                                 :data-db db
                                                 :vu-type :bar
                                                 :display-map :pd
-                                                :led-colors :pd))
+                                                :led-colors :blue))
       (vumeter gui-container :css '(:margin 10px)
                              :data-db db
                              :display-map :db-lin
@@ -70,87 +75,87 @@
                              :led-colors :blue)
 ;;;      (toggle gui-container)
 
-      ;; (radio gui-container :css '(:margin 10px :height 17px)
-      ;;                      :background-off '("#666" "#999")
-      ;;                      :label-off (loop for n below 8 collect n)
-      ;;                      :label-on (loop for n below 8 collect n)
-      ;;                      :direction "right"
-      ;;                      :val-change-cb (lambda (v obj)
-      ;;                                       (declare (ignore obj))
-      ;;                                       (format t "radio: ~a~%" v)))
-      ;; (radio gui-container :css '(:margin 10px :width 17px :height 136px)
-      ;;                            :background-off '("#666" "#999")
-      ;;                      :label-off (loop for n below 8 collect n)
-      ;;                      :label-on (loop for n below 8 collect n)
-      ;;                      :direction "down"
-      ;;                      :val-change-cb (lambda (v obj)
-      ;;                                       (declare (ignore obj))
-      ;;                                       (format t "radio: ~a~%" v)))
-      ;; (radio gui-container :css '(:margin 10px :height 17px)
-      ;;                      :background-off '("#666" "#999")
-      ;;                      :label-off (loop for n below 8 collect n)
-      ;;                      :label-on (loop for n below 8 collect n)
-      ;;                      :direction "left"
-      ;;                      :val-change-cb (lambda (v obj)
-      ;;                                       (declare (ignore obj))
-      ;;                                       (format t "radio: ~a~%" v)))
-      ;; 
-      ;; (radio gui-container :css '(:margin 10px :width 17px :height 136px)
-      ;;                      :background-off '("#666" "#999")
-      ;;                      :label-off (loop for n below 8 collect n)
-      ;;                      :label-on (loop for n below 8 collect n)
-      ;;                      :direction "up"
-      ;;                      :val-change-cb (lambda (v obj)
-      ;;                                       (declare (ignore obj))
-      ;;                                       (format t "radio: ~a~%" v)))
-      ;; 
-      ;; (radio gui-container :css '(:height 40px :margin 10px)
-      ;;        :background-off "transparent")
-      ;; (toggle gui-container :css '(:margin 10px :height 17px)
-      ;;                       :background "transparent"
-      ;;                       :val-change-cb (lambda (x obj)
-      ;;                                        (declare (ignore obj))
-      ;;                                        (format t "toggle: ~a~%" x)))
-      ;; (numbox gui-container :css '(:margin 10px :width 50px)
-      ;;         :min 10 :max 100 :value 300
-      ;;                       :val-change-cb (lambda (value obj) (declare (ignore obj)) (format t "numbox value: ~a~%" value)))
-      ;; (vslider gui-container
-      ;;          :css '(:height 100px :flex "0 0 auto"
-      ;;                 :margin 10px)
-      ;;          :value 0.70
-      ;;          :background "transparent"
-      ;;          :color "transparent"
-      ;;          :slider-thumb-height 1
-      ;;          :val-change-cb (lambda (val obj)
-      ;;                           (format t "slider element ~S changed to ~a~%" obj val)))
-      ;; (vslider gui-container :css '(:height 100px :flex "0 0 auto" :margin 10px :background "transparent" :--bar-color "lightblue")
-      ;;                        :value 0.2 :thumb nil :mapping :log :clip-zero t)
-      ;; (vslider gui-container :css '(:height 100px :flex "0 0 auto" :margin 10px :background "transparent" :--bar-color "lightblue")
-      ;;                        :value 0.2 :thumb nil :mapping :log :clip-zero t :direction "down")
-      ;; (vslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "lightblue") :value 0.50)
-      ;; (vslider gui-container :css '(:flex "0 0 auto" :margin 10px) :value 0.50)
-      ;; (vslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "#555" :--thumb-color "orange") :value 0.10)
-      ;; (vslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "lightblue" :--bar-color "lightgreen" :--thumb-color "red") :value 0.90)
-      ;; (vslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "lightblue" :--bar-color "#555" :--thumb-color "red") :value 0.90 :direction "up"
-      ;;                        :val-change-cb (lambda (val obj) (declare (ignore obj)) (format t "value changed: ~a~%" val)))
-      ;; (vslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "lightblue" :--bar-color "#555" :--thumb-color "red") :value 0.90 :direction "down"
-      ;;                              :val-change-cb (lambda (val obj) (declare (ignore obj)) (format t "value changed: ~a~%" val)))
-      ;; (hslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "lightblue" :--bar-color "#555" :--thumb-color "red") :value 0.90 :direction "right"
-      ;;                        :val-change-cb (lambda (val obj) (declare (ignore obj)) (format t "value changed: ~a~%" val)))
-      ;; (hslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "lightblue" :--bar-color "#555" :--thumb-color "red") :value 0.90 :direction "left"
-      ;;                        :val-change-cb (lambda (val obj) (declare (ignore obj)) (format t "value changed: ~a~%" val)))
-      ;; 
-      ;; (hslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "transparent" :--bar-color "lightblue")
-      ;;                        :value 0.2 :thumb nil :mapping :log :clip-zero t)
-      ;; (hslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "transparent" :--bar-color "lightblue")
-      ;;                        :value 0.2 :thumb nil :mapping :log :clip-zero t :direction "left")
-      ;; (setf *my-slider* (multiple-value-list
-      ;;                    (multi-slider gui-container :css '(:background "transparent" :margin 10px :width 144px :height 144px) :num 8
-      ;;                                                :val-change-cb (lambda (idx val obj) (format t "valueChanged: ~a ~a ~a~%"
-      ;;                                                                                        idx val obj)))))
-      ;; (multi-slider gui-container :direction "right" :css `(:margin 10px :width 144px :height 144px) :num 16)
-      ;; (multi-slider gui-container :direction "down" :css `(:margin 10px  :width 144px :height 144px) :num 16)
-      ;; (multi-slider gui-container :direction "left" :css `(:margin 10px :width 144px :height 144px) :num 16)
+      (setf *my-radio*
+            (radio gui-container :css '(:margin 10px :height 17px)
+                                 :background-off '("#666" "#999")
+                                 :label-off (loop for n below 8 collect n)
+                                 :label-on (loop for n below 8 collect n)
+                                 :direction "right"
+                                 :val-change-cb (lambda (v obj)
+                                                  (declare (ignore obj))
+                                                  (format t "radio: ~a~%" v))))
+      (radio gui-container :css '(:margin 10px :width 17px :height 136px)
+                                 :background-off '("#666" "#999")
+                           :label-off (loop for n below 8 collect n)
+                           :label-on (loop for n below 8 collect n)
+                           :direction "down"
+                           :val-change-cb (lambda (v obj)
+                                            (declare (ignore obj))
+                                            (format t "radio: ~a~%" v)))
+      (radio gui-container :css '(:margin 10px :height 17px)
+                           :background-off '("#666" "#999")
+                           :label-off (loop for n below 8 collect n)
+                           :label-on (loop for n below 8 collect n)
+                           :direction "left"
+                           :val-change-cb (lambda (v obj)
+                                            (declare (ignore obj))
+                                            (format t "radio: ~a~%" v)))
+      
+      (radio gui-container :css '(:margin 10px :width 17px :height 136px)
+                           :background-off '("#666" "#999")
+                           :label-off (loop for n below 8 collect n)
+                           :label-on (loop for n below 8 collect n)
+                           :direction "up"
+                           :val-change-cb (lambda (v obj)
+                                            (declare (ignore obj))
+                                            (format t "radio: ~a~%" v)))
+      
+      (radio gui-container :css '(:height 40px :margin 10px)
+             :background-off "transparent")
+      (setf *my-toggle* (toggle gui-container :css '(:margin 10px :height 17px)
+                                              :background "transparent"
+                                              :val-change-cb (lambda (x obj)
+                                                               (declare (ignore obj))
+                                                               (format t "toggle: ~a~%" x))))
+      (setf *my-numbox* (numbox gui-container :css '(:margin 10px :width 50px)
+                                              :min 10 :max 100 :value 300
+                                              :val-change-cb (lambda (value obj) (declare (ignore obj)) (format t "numbox value: ~a~%" value))))
+      (setf *my-slider* (vslider gui-container
+                                      :css '(:height 100px :flex "0 0 auto"
+                                             :margin 10px)
+                                      :value 0.70
+                                      :background "transparent"
+                                      :color "transparent"
+                                      :slider-thumb-height 1
+                                      :val-change-cb (lambda (val obj)
+                                                       (format t "slider element ~S changed to ~a~%" obj val))))
+      (vslider gui-container :css '(:height 100px :flex "0 0 auto" :margin 10px :background "transparent" :--bar-color "lightblue")
+                             :value 0.2 :thumb nil :mapping :log :clip-zero t)
+      (vslider gui-container :css '(:height 100px :flex "0 0 auto" :border "none" :margin 10px :background "transparent" :--bar-color "lightblue")
+                             :value 0.2 :thumb nil :mapping :log :clip-zero t :direction "down")
+      (vslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "lightblue") :value 0.50)
+      (vslider gui-container :css '(:flex "0 0 auto" :margin 10px) :value 0.50)
+      (vslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "#555" :--thumb-color "orange") :value 0.10)
+      (vslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "lightblue" :--bar-color "lightgreen" :--thumb-color "red") :value 0.90)
+      (vslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "lightblue" :--bar-color "#555" :--thumb-color "red") :value 0.90 :direction "up"
+                             :val-change-cb (lambda (val obj) (declare (ignore obj)) (format t "value changed: ~a~%" val)))
+      (vslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "lightblue" :--bar-color "#555" :--thumb-color "red") :value 0.90 :direction "down"
+                                   :val-change-cb (lambda (val obj) (declare (ignore obj)) (format t "value changed: ~a~%" val)))
+      (hslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "lightblue" :--bar-color "#555" :--thumb-color "red") :value 0.90 :direction "right"
+                             :val-change-cb (lambda (val obj) (declare (ignore obj)) (format t "value changed: ~a~%" val)))
+      (hslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "lightblue" :--bar-color "#555" :--thumb-color "red") :value 0.90 :direction "left"
+                             :val-change-cb (lambda (val obj) (declare (ignore obj)) (format t "value changed: ~a~%" val)))
+      
+      (hslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "transparent" :--bar-color "lightblue")
+                             :value 0.2 :thumb nil :mapping :log :clip-zero t)
+      (hslider gui-container :css '(:flex "0 0 auto" :margin 10px :background "transparent" :--bar-color "lightblue")
+                             :value 0.2 :thumb nil :mapping :log :clip-zero t :direction "left")
+      (setf *my-multislider* (multi-slider gui-container :css '(:background "transparent" :margin 10px :width 144px :height 144px) :num 8
+                                                         :val-change-cb (lambda (idx val obj) (format t "valueChanged: ~a ~a ~a~%"
+                                                                                                 idx val obj))))
+      (multi-slider gui-container :direction "right" :css `(:margin 10px :width 144px :height 144px) :num 16)
+      (multi-slider gui-container :direction "down" :css `(:margin 10px  :width 144px :height 144px) :num 16)
+      (multi-slider gui-container :direction "left" :css `(:margin 10px :width 144px :height 144px) :num 16)
       
 
       )))

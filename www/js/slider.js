@@ -151,7 +151,7 @@ function slider(elem, config){
                 oldValue = newValue;
                 externalValueChange = false;
                 calcBarSize(fraction);
-                slider.setAttribute('data-value', newValue.toFixed(3));
+                slider.setAttribute('data-val', newValue.toFixed(3));
                 externalValueChange = true;
                 return newValue;
             }
@@ -176,7 +176,7 @@ function slider(elem, config){
 
     slider.setAttribute = function (key, value) {
             mySetAttribute.call(slider, key, value);
-        if (key == 'data-value')
+        if (key == 'data-val')
             if ((externalValueChange) && (value != oldValue)) {
                 oldValue = value;
                 let fraction = valFunctionRev(value);
@@ -271,9 +271,9 @@ function slider(elem, config){
 
     function setSliderValue () {
         if (maxValue >= minValue)
-            value = clamp(parseFloat((slider.getAttribute("data-value")) || 0.0 ), minValue, maxValue);
+            value = clamp(parseFloat((slider.getAttribute("data-val")) || 0.0 ), minValue, maxValue);
         else
-            value = clamp(parseFloat((slider.getAttribute("data-value")) || 0.0 ), maxValue, minValue);
+            value = clamp(parseFloat((slider.getAttribute("data-val")) || 0.0 ), maxValue, minValue);
     }
 
     function setMinMaxMapping () {

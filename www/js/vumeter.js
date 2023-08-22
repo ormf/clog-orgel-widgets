@@ -131,7 +131,7 @@ function vumeter(elem, config){
     }
 
     function setBarSizeY(db) {
-        console.log(((db/112)*vuHeight) + 'px');
+//        console.log(((db/112)*vuHeight) + 'px');
         vuMeter.vuBar.style.height = ((db/112)*vuHeight) + 'px';
     }
     
@@ -141,7 +141,7 @@ function vumeter(elem, config){
     
     function drawBar () {
         var targetDB = clamp((100+parseInt(vuMeter.getAttribute("data-db"), 10)), 0, 112);
-        console.log('drawBar!' + targetDB + ' ' + colors[targetDB]);
+//        console.log('drawBar!' + targetDB + ' ' + colors[targetDB]);
         setBarSize(targetDB); 
         vuMeter.vuBar.style.backgroundColor = colors[dbLedIdxLookup[targetDB]];
     }
@@ -244,7 +244,7 @@ function vumeter(elem, config){
      }
 
     function setLedMapping () {
-        console.log('ledMapping: ' + ledMapping);
+//        console.log('ledMapping: ' + ledMapping);
         switch (ledMapping) {
         case 'pd' :
             dbLedIdxLookup = [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 9, 9, 9, 10, 10, 11, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 19, 19, 20, 21, 22, 23, 24, 25, 27, 29, 31, 33, 34, 35, 36, 37, 37, 38, 39, 39, 39, 40];            
@@ -280,7 +280,7 @@ function vumeter(elem, config){
         vuMeter.style.background = 'var(--vu-background)';
         vuHeight = parseFloat(style.height);
         vuWidth = parseFloat(style.width);
-        console.log('height: ' + vuHeight + ', width: ' + vuWidth + ' ' + vuType);
+//        console.log('height: ' + vuHeight + ', width: ' + vuWidth + ' ' + vuType);
         switch (ledColors) {
         case "green":
             setGreenColors();
@@ -301,12 +301,12 @@ function vumeter(elem, config){
         setLedMapping();
         switch(vuType) {
         case 'led' :
-            console.log('ledColors: ' + ledColors);
+//            console.log('ledColors: ' + ledColors);
             drawVu = drawLed;
             createLeds(vuMeter);
             break;
         case 'bar' :
-            console.log('drawBar: ' + ledColors);
+//            console.log('drawBar: ' + ledColors);
             createBar(vuMeter);
             setBarDirection();
             drawVu = drawBar;

@@ -66,7 +66,7 @@ function multislider(elem, config) {
         div.setAttribute('style', 'border: 1px solid black;flex: 1 0 auto;');
         div.setAttribute('data-min', minValue);
         div.setAttribute('data-max', maxValue);
-        div.setAttribute('data-value', '0');
+        div.setAttribute('data-val', '0');
         div.setAttribute('data-clip-zero', clipZero);
         div.setAttribute('data-mapping', mapping);
         div.setAttribute('data-direction', direction);
