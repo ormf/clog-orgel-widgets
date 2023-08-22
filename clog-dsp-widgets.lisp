@@ -334,8 +334,7 @@
           (clog::set-event btn "valuechange"
                            (lambda (data)
                              (declare (ignore data))
-                             (let ((val (read-from-string (attribute btn "data-val"))))
-                               (funcall val-change-cb val btn))))))
+                             (funcall val-change-cb (value btn))))))
     btn))
 
 (defun radio (container &rest args
@@ -381,8 +380,7 @@
           (clog::set-event radio "valuechange"
                            (lambda (data)
                              (declare (ignore data))
-                             (let ((val (read-from-string (attribute radio "data-val"))))
-                               (funcall val-change-cb val radio))))))
+                             (funcall val-change-cb (value radio))))))
     radio))
 
 (deftype vu-type () '(member :led :bar))
