@@ -41,6 +41,11 @@
     (list arg)
     (t (list arg))))
 
+(defmacro with-lists (tokens &rest body)
+  "rebind all tokens to ensure they are lists."
+  `(let ,(mapcar (lambda (tk) (list tk '`(ensure-list ,tk))) tokens)
+     ,@body))
+
 ;;; (ensure-list "")
 ;;; (ensure-list #(1 2 3))
 
@@ -285,57 +290,65 @@
 (defmethod (setf text-value) (value (obj clog-progress-bar))
   (setf (property obj "value") value))
 
+                           :label-off ,(first label)
+                           :label-on ,(or (second label) (first label))
+                           :text-color-off ,(first text-color)
+                           :test-color-on ,(or (second text-color) (first text-color))
+                           :background-off ,(first background)
+                           :background-on ,(or (second background) (first background))
+                           :value-off ,(first value)
+                           :value-on ,(or (second value) (first value))
+
+(defun pref-second (val-list)
+  (or (second val-list) (first val-list)))
+
 (defun toggle (container &rest args
                &key (style "") (size 10)
-                 (text-color-off "black")
-                 (background-off "white")
-                 (label-off "")
-                 (text-color-on "black")
-                 (background-on "orange")
-                 (label-on "")
-                 (value-off "0")
-                 (value-on "1")
+                 (text-color "black")
+                 (background '("white" "orange"))
+                 (label "")
+                 (values '("0" "1"))
                  (value 0)
                  val-change-cb
-                 &allow-other-keys)
-  (let* ((css (getf args :css))
-         (background-off (or (getf args :background-color) (getf args :background) background-off))
-         (btn (create-toggle
-               container
-               :class "toggle"
-               :css (append
-                     `(:align center
-                       :color ,text-color-off
-                       :background ,background-off
-                       :--textbox-selected-foreground ,text-color-on
-                       :--textbox-selected-background ,background-on
-                       :font-size ,(addpx size)
-                       :width ,(or (getf css :width) (addpx (* size 5)))
-                       :height ,(or (getf css :height) (addpx (* size 1.7))))
-                     (progn
-                       (dolist (prop '(:width :height)) (remf args prop))
-                       css))
-               :data-val value
-               :style style)))
-    (let ((str (format nil "toggle(~A, { ~{~{'~a': '~(~a~)'~}~^, ~} })"
-                       (jquery btn)
-                       `(("colorOff" ,text-color-off)
-                         ("backgroundOff" ,background-off)
-                         ("labelOff" ,label-off)
-                         ("valueOff" ,value-off)
-                         ("colorOn" ,text-color-on)
-                         ("backgroundOn" ,background-on)
-                         ("labelOn" ,label-on)
-                         ("valueOn" ,value-on)))))
-      ;;      (break "~S" str)
-      (js-execute btn str))
-    (if val-change-cb
-        (progn
-          (clog::set-event btn "valuechange"
-                           (lambda (data)
-                             (declare (ignore data))
-                             (funcall val-change-cb (value btn))))))
-    btn))
+               &allow-other-keys)
+  (with-lists (text-color background label values)
+    (let* ((css (getf args :css))
+           (btn (create-toggle
+                 container
+                 :class "toggle"
+                 :css (append
+                       `(:align center
+                         :color ,(first text-color)
+                         :background ,(first background)
+                         :--textbox-selected-foreground ,(pref-second text-color)
+                         :--textbox-selected-background ,(pref-second background)
+                         :font-size ,(addpx size)
+                         :width ,(or (getf css :width) (addpx (* size 5)))
+                         :height ,(or (getf css :height) (addpx (* size 1.7))))
+                       (progn
+                         (dolist (prop '(:width :height)) (remf args prop))
+                         css))
+                 :data-val value
+                 :style style)))
+      (let ((str (format nil "toggle(~A, { ~{~{'~a': '~(~a~)'~}~^, ~} })"
+                         (jquery btn)
+                         `(("colorOff" ,(first text-color))
+                           ("backgroundOff" ,(first background))
+                           ("labelOff" ,(first label))
+                           ("valueOff" ,(first values))
+                           ("colorOn" ,(pref-second text-color))
+                           ("backgroundOn" ,(pref-second background))
+                           ("labelOn" ,(pref-second label))
+                           ("valueOn" ,(pref-second values))))))
+        ;;      (break "~S" str)
+        (js-execute btn str))
+      (if val-change-cb
+          (progn
+            (clog::set-event btn "valuechange"
+                             (lambda (data)
+                               (declare (ignore data))
+                               (funcall val-change-cb (value btn) btn)))))
+      btn)))
 
 (defun radio (container &rest args
               &key (style "")

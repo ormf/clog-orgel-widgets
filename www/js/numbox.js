@@ -48,6 +48,7 @@ function numbox(elem){
     var minValue;
     var maxValue;
     var lastValue;
+    var numScale;
 
     var mouseMoveListener;
 
@@ -83,15 +84,19 @@ function numbox(elem){
     }
 
     function calcNumScale (mouseX) {
-        if (mouseX < numboxWidth*0.15) return 10;
-        if (mouseX < numboxWidth*0.85) return 1;
+//        console.log('calcNumScale' + ' ' + mouseX);
+        if (mouseX < 0) return 100;
+        if (mouseX < numboxWidth*0.2) return 10;
+        if (mouseX < numboxWidth*0.8) return 1;
         if (mouseX < numboxWidth) return 0.1;
         return 0.01;
     }
 
     function checkMinMax (val) {
-        if (minValue && (val < minValue)) return minValue;
-        else if (maxValue && (val > maxValue)) return maxValue;                
+//        console.log(val + ' ' + (val < minValue) + ' ' + (maxValue && (val > maxValue)));
+        if (val < minValue) return minValue;
+        else if (val > maxValue) return maxValue;
+//        console.log(val + ' ' + minValue + ' ' + maxValue);
         return val;
     }
     
@@ -137,6 +142,7 @@ function numbox(elem){
         dragging = false; // shouldn't be necessary, just in case...
         externalValueChange = false;
         startValue = parseFloat(numbox.getAttribute('value'));
+//        console.log(startValue);
         mouseStartX = event.clientX;
         mouseStartY = event.clientY;
         document.addEventListener('mousemove', mouseMoveListener);
@@ -193,10 +199,11 @@ function numbox(elem){
             ((mouseStartX != event.clientX) || (mouseStartY != event.clientY))) {
             { // called only once after a click and subsequent move.
                 dragging = true;
+                numScale = calcNumScale(event.clientX-offsetLeft);
                 numbox.style.setProperty('--textbox-selected-background', background);
                 numbox.style.setProperty('--textbox-selected-foreground', foreground);
                 numbox.style.setProperty('--textbox-caret-color', 'transparent');
-                currValue = checkMinMax(startValue + (mouseStartY - event.clientY) * calcNumScale(event.clientX));
+                currValue = checkMinMax(startValue + (mouseStartY - event.clientY) * numScale);
                 valString = currValue.toFixed(2); // while dragging truncate attribute to 2 digits after the comma.
                 if (valString != lastValue) {
                     numbox.value = valString;
@@ -209,7 +216,10 @@ function numbox(elem){
             moved = true;
         }
         else { // called while dragging
-            currValue = checkMinMax(lastValue + (lastY - event.clientY) * calcNumScale(event.clientX-offsetLeft));
+            if (event.shiftKey) {
+                numScale = calcNumScale(event.clientX-offsetLeft);
+            }
+            currValue = checkMinMax(lastValue + (lastY - event.clientY) * numScale);
             lastY = event.clientY;
             valString = currValue.toFixed(2); // while dragging truncate to 2 digits after the comma.
             if (valString != lastValue) {
