@@ -200,10 +200,10 @@ CLOG-OBJ"))
 ;;;;;;;;;;;
 
 (defmethod value ((obj clog-numbox))
-  (read-from-string (property obj "value")))
+  (read-from-string (attribute obj "value")))
 
 (defmethod (setf value) (value (obj clog-numbox))
-  (setf (property obj "value") value))
+  (setf (attribute obj "value") value))
 
 (defmethod min-val ((obj clog-numbox))
   (read-from-string (attribute obj "data-min")))

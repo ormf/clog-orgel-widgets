@@ -116,6 +116,8 @@ function numbox(elem){
     // override setAttribute extending the original definition.
 
     numbox.setAttribute = function (key, value) {
+        value = parseFloat(value);
+//        console.log('setAttribute: ', value);
         if (key == 'value') {
             if ((externalValueChange) && (value != lastValue)) {
                 numbox.value = formatNumBox(value);
@@ -157,7 +159,7 @@ function numbox(elem){
         if (moved == false) {
             { // called only once after a click and subsequent move.
                 dragging = true;
-                console.log('dragging1');
+//                console.log('dragging1');
                 numScale = calcNumScale(event.clientX-offsetLeft);
                 numbox.style.setProperty('--textbox-selected-background', background);
                 numbox.style.setProperty('--textbox-selected-foreground', foreground);
@@ -175,7 +177,7 @@ function numbox(elem){
             moved = true;
         }
         else { // called while dragging
-            console.log('dragging2 ' + numScale + ' ' + event.clientY + ' ' + lastValue + ' ' + lastY);
+//            console.log('dragging2 ' + numScale + ' ' + event.clientY + ' ' + lastValue + ' ' + lastY);
             if (event.shiftKey) {
                 numScale = calcNumScale(event.clientX-offsetLeft);
             }
