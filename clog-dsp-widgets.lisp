@@ -43,7 +43,7 @@
 
 (defmacro with-lists (tokens &rest body)
   "rebind all tokens to ensure they are lists."
-  `(let ,(mapcar (lambda (tk) (list tk '`(ensure-list ,tk))) tokens)
+  `(let ,(mapcar (lambda (tk) (list tk `(ensure-list ,tk))) tokens)
      ,@body))
 
 ;;; (ensure-list "")
@@ -271,7 +271,7 @@
             :data-min (or (getf args :min) "false")
             :data-max (or (getf args :max) "false")
             :style style))
-         (label (if label (create-label container :content (ensure-string label) :css '(:margin-right 0) :style label-style))))
+         (label (if label (create-label container :content (ensure-string label) :css '(:margin-right 0 :user-select "none") :style label-style))))
     (declare (ignorable label))
 ;;;    (clog::unbind-event-script numbox "onmousedown")
      (js-execute numbox (format nil "numbox(~A)" (jquery numbox)))
@@ -289,15 +289,6 @@
 
 (defmethod (setf text-value) (value (obj clog-progress-bar))
   (setf (property obj "value") value))
-
-                           :label-off ,(first label)
-                           :label-on ,(or (second label) (first label))
-                           :text-color-off ,(first text-color)
-                           :test-color-on ,(or (second text-color) (first text-color))
-                           :background-off ,(first background)
-                           :background-on ,(or (second background) (first background))
-                           :value-off ,(first value)
-                           :value-on ,(or (second value) (first value))
 
 (defun pref-second (val-list)
   (or (second val-list) (first val-list)))
@@ -449,13 +440,21 @@
       (js-execute vu-container str)
       vu-container)))
 
-(defun multi-vu (container &key (num 8) (width 80) (height 100) background (direction :up) (border "")
+(defun multi-vu (container &key (num 8) (width 80) (height 100)  (background "transparent") (direction :up) (border "")
                              (inner-background "var(--vu-background)") (inner-border "") inner-padding inner-padding-bottom
-                             led-colors style
+                             led-colors css
                              val-change-cb)
   (declare (ignorable val-change-cb))
   (let* ((mvu (create-multivu container
-                              :style (format nil "color: transparent; background-color: ~a;border: ~a;width: ~Apx;height: ~Apx;display: flex;padding: 0pt;~@[~A~]" (or background "transparent") border width height style)))
+                              :css (append
+                                    `(:color transparent
+                                      :background-color ,background
+                                      :border ,border
+                                      :width ,width
+                                      :height ,height
+                                      :display flex
+                                      :padding 0px)
+                                    css)))
          (vus (loop
                 for n below num
                 collect (vumeter

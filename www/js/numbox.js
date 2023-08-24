@@ -116,13 +116,15 @@ function numbox(elem){
     // override setAttribute extending the original definition.
 
     numbox.setAttribute = function (key, value) {
-        mySetAttribute.call(numbox, key, value);
         if (key == 'value') {
             if ((externalValueChange) && (value != lastValue)) {
                 numbox.value = formatNumBox(value);
+                mySetAttribute.call(numbox, key, numbox.value);
             }
-            else 
+            else { 
+                mySetAttribute.call(numbox, key, numbox.value);
                 numbox.dispatchEvent(valChangeEvent);
+            }
         }
     }
 
@@ -142,13 +144,51 @@ function numbox(elem){
         dragging = false; // shouldn't be necessary, just in case...
         externalValueChange = false;
         startValue = parseFloat(numbox.getAttribute('value'));
-//        console.log(startValue);
         mouseStartX = event.clientX;
         mouseStartY = event.clientY;
         document.addEventListener('mousemove', mouseMoveListener);
         document.addEventListener('mouseup', mouseUpListener);
     }
 
+    var currValue;
+    
+    function mouseMoveListener (event) {
+        let valString;
+        if (moved == false) {
+            { // called only once after a click and subsequent move.
+                dragging = true;
+                console.log('dragging1');
+                numScale = calcNumScale(event.clientX-offsetLeft);
+                numbox.style.setProperty('--textbox-selected-background', background);
+                numbox.style.setProperty('--textbox-selected-foreground', foreground);
+                numbox.style.setProperty('--textbox-caret-color', 'transparent');
+                currValue = checkMinMax(startValue + (mouseStartY - event.clientY) * numScale);
+                valString = currValue.toFixed(2); // while dragging truncate attribute to 2 digits after the comma.
+                if (valString != lastValue) {
+                    numbox.value = valString;
+                    numbox.setAttribute('value', valString);
+                    lastValue = currValue;
+                }
+                numbox.style.textAlign = 'right'; // and align right.
+                lastY = event.clientY;
+            }
+            moved = true;
+        }
+        else { // called while dragging
+            console.log('dragging2 ' + numScale + ' ' + event.clientY + ' ' + lastValue + ' ' + lastY);
+            if (event.shiftKey) {
+                numScale = calcNumScale(event.clientX-offsetLeft);
+            }
+            currValue = checkMinMax(lastValue + (lastY - event.clientY) * numScale);
+            lastY = event.clientY;
+            valString = currValue.toFixed(2); // while dragging truncate to 2 digits after the comma.
+            if (valString != lastValue) {
+                numbox.value = valString;
+                numbox.setAttribute('value', valString);
+                lastValue = currValue;
+                }
+        }
+    }
     function handleKeyDown (event) {
         let keyCode = event.which? event.which : event.keyCode;
         if ((keyCode > 30 && keyCode < 58)
@@ -191,50 +231,13 @@ function numbox(elem){
         externalValueChange = true;
     }
 
-    var currValue;
-    
-    function mouseMoveListener (event) {
-        let valString;
-        if ((moved == false) &&
-            ((mouseStartX != event.clientX) || (mouseStartY != event.clientY))) {
-            { // called only once after a click and subsequent move.
-                dragging = true;
-                numScale = calcNumScale(event.clientX-offsetLeft);
-                numbox.style.setProperty('--textbox-selected-background', background);
-                numbox.style.setProperty('--textbox-selected-foreground', foreground);
-                numbox.style.setProperty('--textbox-caret-color', 'transparent');
-                currValue = checkMinMax(startValue + (mouseStartY - event.clientY) * numScale);
-                valString = currValue.toFixed(2); // while dragging truncate attribute to 2 digits after the comma.
-                if (valString != lastValue) {
-                    numbox.value = valString;
-                    numbox.setAttribute('value', valString);
-                    lastValue = currValue;
-                }
-                numbox.style.textAlign = 'right'; // and align right.
-                lastY = event.clientY;
-            }
-            moved = true;
-        }
-        else { // called while dragging
-            if (event.shiftKey) {
-                numScale = calcNumScale(event.clientX-offsetLeft);
-            }
-            currValue = checkMinMax(lastValue + (lastY - event.clientY) * numScale);
-            lastY = event.clientY;
-            valString = currValue.toFixed(2); // while dragging truncate to 2 digits after the comma.
-            if (valString != lastValue) {
-                numbox.value = valString;
-                numbox.setAttribute('value', valString);
-                lastValue = currValue;
-            }
-        }
-    }
     
     function mouseUpListener (event){
         if (dragging) {
             numbox.blur();
             numbox.style.textAlign = 'center'; // restore alignment
             numbox.value = formatNumBox(parseFloat(numbox.getAttribute('value')))
+
             document.removeEventListener('mousemove', mouseMoveListener);
             document.removeEventListener('mouseup', mouseUpListener);
             externalValueChange = true;
@@ -250,7 +253,6 @@ function numbox(elem){
     }
 
     numbox.dispatchValChangeEvent = function () {
-//        console.log('value changed');
         numbox.dispatchEvent(valChangeEvent);
     }
 
@@ -271,10 +273,10 @@ function numbox(elem){
             numbox.setAttribute('data-max', "false");
             maxValue = false;
         }
-        let value = parseFloat(numbox.value);
+        let value = parseFloat(numbox.getAttribute('value'));
         if (isNaN(value)) value = minValue;
         else value = checkMinMax(value);
-        numbox.value = formatNumBox(value);
+        numbox.value = value;
     }
 
     init();
