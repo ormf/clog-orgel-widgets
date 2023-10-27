@@ -142,6 +142,7 @@
                             (lambda (data)
                               (declare (ignore data))
                               (let ((val-string (attribute slider "data-val")))
+;;;                                (format t "clog-dsp-widgets::slider-template, value-change: ~a~%" val-string)
                                 (funcall val-change-cb val-string slider))))))
      slider))
 
@@ -264,7 +265,7 @@
                     :--textbox-selected-background ,selected-background
                     :font-size ,(addpx size)
                     :width ,(or width (addpx (* size 5)))
-                    :height ,(or height (addpx (* size 1.7))))
+                    :height ,(or height (addpx (* size 1.5))))
                   (progn
                     (dolist (prop '(:width :height :font-size)) (remf css prop))
                     css))

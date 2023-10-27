@@ -18,7 +18,7 @@
 ;;;
 ;;; **********************************************************************
 
-(asdf:defsystem #:clog-dsp-widget-example
+(asdf:defsystem #:clog-dsp-widgets-example
   :description "widgets for audio dsp guis in clog."
   :author "Orm Finnendahl <orm.finnendahl@selma.hfmdk-frankfurt.de>"
   :license  "gpl 2.0 or later"

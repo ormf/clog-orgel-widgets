@@ -19,5 +19,5 @@
 ;;; **********************************************************************
 
 (defpackage #:clog-dsp-widgets-example
-  (:use #:cl #:clog #:clog-gui))
+  (:use #:cl #:clog #:clog-gui #:clog-dsp-widgets))
 

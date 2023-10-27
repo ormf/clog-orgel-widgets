@@ -18,20 +18,6 @@
 ;;;
 ;;; **********************************************************************
 
-(ql:quickload :clog-dsp-widgets)
-
-(asdf:defsystem #:clog-dsp-widget-example
-  :description "example for the usage of widgets for audio dsp guis in clog."
-  :author "Orm Finnendahl <orm.finnendahl@selma.hfmdk-frankfurt.de>"
-  :license  "gpl 2.0 or later"
-  :version "0.0.1"
-  :depends-on (#:clog #:clog-dsp-widgets)
-  :serial t
-  :components ())
-
-(defpackage #:clog-dsp-widgets-example
-  (:use #:cl #:clog #:clog-gui #:clog-dsp-widgets))
-
 (in-package :clog-dsp-widgets-example)
 
 (defparameter *my-vumeter* nil)
@@ -81,24 +67,21 @@
                                  :label-off (loop for n below 8 collect n)
                                  :label-on (loop for n below 8 collect n)
                                  :direction "right"
-                                 :val-change-cb (lambda (v obj)
-                                                  (declare (ignore obj))
+                                 :val-change-cb (lambda (v)
                                                   (format t "radio: ~a~%" v))))
       (radio gui-container :css '(:margin 10px :width 17px :height 136px)
                                  :background-off '("#666" "#999")
                            :label-off (loop for n below 8 collect n)
                            :label-on (loop for n below 8 collect n)
                            :direction "down"
-                           :val-change-cb (lambda (v obj)
-                                            (declare (ignore obj))
+                           :val-change-cb (lambda (v)
                                             (format t "radio: ~a~%" v)))
       (radio gui-container :css '(:margin 10px :height 17px)
                            :background-off '("#666" "#999")
                            :label-off (loop for n below 8 collect n)
                            :label-on (loop for n below 8 collect n)
                            :direction "left"
-                           :val-change-cb (lambda (v obj)
-                                            (declare (ignore obj))
+                           :val-change-cb (lambda (v)
                                             (format t "radio: ~a~%" v)))
       
       (radio gui-container :css '(:margin 10px :width 17px :height 136px)
@@ -106,29 +89,32 @@
                            :label-off (loop for n below 8 collect n)
                            :label-on (loop for n below 8 collect n)
                            :direction "up"
-                           :val-change-cb (lambda (v obj)
-                                            (declare (ignore obj))
+                           :val-change-cb (lambda (v)
                                             (format t "radio: ~a~%" v)))
       
       (radio gui-container :css '(:height 40px :margin 10px)
-             :background-off "transparent")
+                           :background-off "transparent"
+                           :val-change-cb (lambda (v)
+                                            (format t "radio: ~a~%" v)))
       (setf *my-toggle* (toggle gui-container :css '(:margin 10px :height 17px)
-                                              :background "transparent"
+                                              :background '("transparent" "orange")
                                               :val-change-cb (lambda (x obj)
                                                                (declare (ignore obj))
                                                                (format t "toggle: ~a~%" x))))
       (setf *my-numbox* (numbox gui-container :css '(:margin 10px :width 50px)
                                               :min 10 :max 100 :value 300
                                               :val-change-cb (lambda (value obj) (declare (ignore obj)) (format t "numbox value: ~a~%" value))))
-      (setf *my-slider* (vslider gui-container
-                                      :css '(:height 100px :flex "0 0 auto"
-                                             :margin 10px)
-                                      :value 0.70
-                                      :background "transparent"
-                                      :color "transparent"
-                                      :slider-thumb-height 1
-                                      :val-change-cb (lambda (val obj)
-                                                       (format t "slider element ~S changed to ~a~%" obj val))))
+      (setf
+       *my-slider*
+       (vslider gui-container
+                :css '(:height 100px :flex "0 0 auto"
+                       :margin 10px)
+                :value 0.70
+                :background "transparent"
+                :color "transparent"
+                :slider-thumb-height 1
+                :val-change-cb (lambda (val obj)
+                                 (format t "slider element ~S changed to ~a~%" obj val))))
       (vslider gui-container :css '(:height 100px :flex "0 0 auto" :margin 10px :background "transparent" :--bar-color "lightblue")
                              :value 0.2 :thumb nil :mapping :log :clip-zero t)
       (vslider gui-container :css '(:height 100px :flex "0 0 auto" :border "none" :margin 10px :background "transparent" :--bar-color "lightblue")
@@ -155,16 +141,13 @@
                                                                                                  idx val obj))))
       (multi-slider gui-container :direction "right" :css `(:margin 10px :width 144px :height 144px) :num 16)
       (multi-slider gui-container :direction "down" :css `(:margin 10px  :width 144px :height 144px) :num 16)
-      (multi-slider gui-container :direction "left" :css `(:margin 10px :width 144px :height 144px) :num 16)
-      
-
-      )))
+      (multi-slider gui-container :direction "left" :css `(:margin 10px :width 144px :height 144px) :num 16))))
 
 ;;; *my-slider*
 
 (defun start-dsp-widgets-example ()
   "Start Orgel Gui."
-  (initialize 'on-new-window
+  (initialize #'on-new-window
               :static-root (merge-pathnames "./www/" (asdf:system-source-directory :clog-dsp-widgets)))
   (open-browser))
 

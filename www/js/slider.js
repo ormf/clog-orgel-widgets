@@ -144,15 +144,16 @@ function slider(elem, config){
     }
 
     slider.setBarSize = function (fraction) {
+        // value change triggered by mouse interaction in the gui.
         if (fraction != oldFraction) {
             oldFraction = fraction;
-            let newValue = valFunction(fraction);
+            let newValue = valFunction(fraction).toFixed(3);
             if (newValue != oldValue) {
-                oldValue = newValue;
-                externalValueChange = false;
+                slider.externalValueChange = false;
                 calcBarSize(fraction);
-                slider.setAttribute('data-val', newValue.toFixed(3));
-                externalValueChange = true;
+                slider.setAttribute('data-val', newValue);
+                slider.externalValueChange = true;
+                oldValue = newValue;
                 return newValue;
             }
         }
@@ -168,7 +169,7 @@ function slider(elem, config){
     // the value has to be reverse calculated into a slider fraction
     // and no valuechange event is generated.
 
-    externalValueChange = true;
+    slider.externalValueChange = true;
 
     // override setAttribute
 
@@ -176,14 +177,18 @@ function slider(elem, config){
 
     slider.setAttribute = function (key, value) {
             mySetAttribute.call(slider, key, value);
-        if (key == 'data-val')
-            if ((externalValueChange) && (value != oldValue)) {
-                oldValue = value;
-                let fraction = valFunctionRev(value);
-                calcBarSize(fraction);
+        if (key == 'data-val') {
+//            console.log("val-change: " + value + ", oldValue: " + oldValue + ", external: " + slider.externalValueChange);
+            if (slider.externalValueChange) {
+                if (value != oldValue) {
+                    oldValue = value;
+                    let fraction = valFunctionRev(value);
+                    calcBarSize(fraction);
+                }
             }
-        else 
-            slider.dispatchEvent(valChangeEvent);
+            else 
+                slider.dispatchEvent(valChangeEvent);
+        }
     }
     
     // setup routines
@@ -356,6 +361,7 @@ function slider(elem, config){
         clipZero = slider.getAttribute("data-clip-zero") || 'false';
         setMinMaxMapping(sliderBar);
         slider.addEventListener('mousedown', mouseDownListener)
+        slider.externalValueChange = true;
     }
 
     initSlider();
