@@ -154,8 +154,6 @@ function numbox(elem){
         document.addEventListener('mousemove', mouseMoveListener);
         document.addEventListener('mouseup', mouseUpListener);
     }
-
-    var currValue;
     
     function mouseMoveListener (event) {
         let valString;
@@ -167,12 +165,12 @@ function numbox(elem){
                 numbox.style.setProperty('--textbox-selected-background', background);
                 numbox.style.setProperty('--textbox-selected-foreground', foreground);
                 numbox.style.setProperty('--textbox-caret-color', 'transparent');
-                currValue = checkMinMax(startValue + (mouseStartY - event.clientY) * numScale);
-                valString = currValue.toFixed(2); // while dragging truncate attribute to 2 digits after the comma.
+                numbox.currValue = checkMinMax(startValue + (mouseStartY - event.clientY) * numScale);
+                valString = numbox.currValue.toFixed(2); // while dragging truncate attribute to 2 digits after the comma.
                 if (valString != lastValue) {
                     numbox.value = valString;
                     numbox.setAttribute('value', valString);
-                    lastValue = currValue;
+                    lastValue = numbox.currValue;
                 }
                 numbox.style.textAlign = 'right'; // and align right.
                 lastY = event.clientY;
@@ -184,13 +182,13 @@ function numbox(elem){
             if (event.shiftKey) {
                 numScale = calcNumScale(event.clientX-offsetLeft);
             }
-            currValue = checkMinMax(lastValue + (lastY - event.clientY) * numScale);
+            numbox.currValue = checkMinMax(lastValue + (lastY - event.clientY) * numScale);
             lastY = event.clientY;
-            valString = currValue.toFixed(2); // while dragging truncate to 2 digits after the comma.
+            valString = numbox.currValue.toFixed(2); // while dragging truncate to 2 digits after the comma.
             if (valString != lastValue) {
                 numbox.value = valString;
                 numbox.setAttribute('value', valString);
-                lastValue = currValue;
+                lastValue = numbox.currValue;
                 }
         }
     }
@@ -282,6 +280,7 @@ function numbox(elem){
         if (isNaN(value)) value = minValue;
         else value = checkMinMax(value);
         numbox.value = value;
+        numbox.currValue = value;
     }
 
     init();
