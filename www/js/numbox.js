@@ -107,7 +107,7 @@ function numbox(elem){
     // interaction. In case it is triggered by an external program
     // (via setAttribute) no valuechange event is generated.
 
-    externalValueChange = true;
+    numbox.externalValueChange = true;
 
     // store original setAttribute function
 
@@ -119,13 +119,16 @@ function numbox(elem){
         value = parseFloat(value);
 //        console.log('setAttribute: ', value);
         if (key == 'value') {
-            if ((externalValueChange) && (value != lastValue)) {
+            if (numbox.externalValueChange) {
                 numbox.value = formatNumBox(value);
-                mySetAttribute.call(numbox, key, numbox.value);
+                if (value != lastValue)
+                    mySetAttribute.call(numbox, key, numbox.value);
             }
             else { 
-                mySetAttribute.call(numbox, key, numbox.value);
-                numbox.dispatchEvent(valChangeEvent);
+                if (value != lastValue) {
+                    mySetAttribute.call(numbox, key, numbox.value);
+                    numbox.dispatchEvent(valChangeEvent);
+                }
             }
         }
     }
@@ -144,7 +147,7 @@ function numbox(elem){
     function mouseDownListener (event) {
         moved = false;
         dragging = false; // shouldn't be necessary, just in case...
-        externalValueChange = false;
+        numbox.externalValueChange = false;
         startValue = parseFloat(numbox.getAttribute('value'));
         mouseStartX = event.clientX;
         mouseStartY = event.clientY;
@@ -230,7 +233,7 @@ function numbox(elem){
         numbox.value = formatNumBox(number);
         numbox.addEventListener('mousedown', mouseDownListener);
         numbox.removeEventListener('blur', onEditBlurListener);
-        externalValueChange = true;
+        numbox.externalValueChange = true;
     }
 
     
@@ -242,7 +245,7 @@ function numbox(elem){
 
             document.removeEventListener('mousemove', mouseMoveListener);
             document.removeEventListener('mouseup', mouseUpListener);
-            externalValueChange = true;
+            numbox.externalValueChange = true;
             dragging = false;
         }
         else {

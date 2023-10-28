@@ -84,7 +84,7 @@ function multislider(elem, config) {
         for (let i = 0; i < num; i++) {
             currSlider = makeSlider(parent.children[i]);
             idx = currSlider.getAttribute('data-idx');
-            currSlider.style.setProperty("--bar-color", colors[idx%numColors]);
+            currSlider.style.setProperty('--bar-color', colors[idx%numColors]);
             if (i > 0) currSlider.style.setProperty(innerBorder, 'none');
             sliders[idx] = currSlider;
             slider(currSlider, { thumb: 'nil' });
@@ -94,9 +94,9 @@ function multislider(elem, config) {
     }
         
     function setMinMaxMapping() {
-        minValue      = parseFloat(multislider.getAttribute("data-min")) || 0.0;
-        maxValue      = parseFloat(multislider.getAttribute("data-max")) || 1.0;
-        mapping       = multislider.getAttribute("data-mapping") || 'lin';
+        minValue      = parseFloat(multislider.getAttribute('data-min')) || 0.0;
+        maxValue      = parseFloat(multislider.getAttribute('data-max')) || 1.0;
+        mapping       = multislider.getAttribute('data-mapping') || 'lin';
         if (mapping == 'log') {
             if ((minValue == 0) && (maxValue == 0)) {
                 minValue = 0.01;
@@ -157,19 +157,19 @@ function multislider(elem, config) {
     }
 
     function setDirection () {
-        direction = multislider.getAttribute("data-direction") || 'up';
+        direction = multislider.getAttribute('data-direction') || 'up';
         switch (direction) {
         case 'right':
             sliderType = 'mhslider';
             innerBorder = 'border-top';
-            multislider.style.flexDirection = "column";
+            multislider.style.flexDirection = 'column';
             getFraction = getXFraction;
             getIdxFraction = getYFractionRev;
             break;
         case 'left':
             sliderType = 'mhslider';
             innerBorder = 'border-top';
-            multislider.style.flexDirection = "column";
+            multislider.style.flexDirection = 'column';
             getFraction = getXFractionRev;
             getIdxFraction = getYFractionRev;
             break;

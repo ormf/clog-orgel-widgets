@@ -17,7 +17,7 @@ function toggle (elem, config) {
     var labelOn          = config.labelOn || '';
     var valueOn          = config.valueOn || '1';
 
-    externalValueChange = false;
+    myToggle.externalValueChange = false;
 
     // override setAttribute
     const mySetAttribute = myToggle.setAttribute;
@@ -33,15 +33,15 @@ function toggle (elem, config) {
     
     myToggle.setAttribute = function (key, value) {
         if (key == 'data-val') {
-            if (externalValueChange == true) {
+            if (myToggle.externalValueChange == true) {
                 value = parseFloat(value).toFixed(0);
                 if (value != valueOff) value = valueOn;
             }
             mySetAttribute.call(myToggle, key, value);
             drawToggle(value);
-            if (externalValueChange == false) {
+            if (myToggle.externalValueChange == false) {
                 myToggle.dispatchEvent(valChangeEvent);
-                externalValueChange == true;
+                myToggle.externalValueChange = true;
             }
         }
     }
@@ -60,7 +60,7 @@ function toggle (elem, config) {
     }
 
     function mouseDownListener (event) {
-        externalValueChange = false;
+        myToggle.externalValueChange = false;
         let val = (myToggle.getAttribute('data-val') == myToggle.valueOff)? valueOn : valueOff;
         myToggle.setAttribute('data-val', val);
     }
@@ -95,6 +95,7 @@ function toggle (elem, config) {
             mySetAttribute.call(myToggle, 'data-val', val);
         }
         drawToggle(val);
+        myToggle.externalValueChange = true;
     }
 
     init();
@@ -126,7 +127,7 @@ function radio (elem, config) {
 
     var getFraction;
 
-    var externalValueChange = true;
+    myRadio.externalValueChange = true;
     
     var style = window.getComputedStyle(myRadio, null);
 
@@ -205,7 +206,7 @@ function radio (elem, config) {
         moved = false;
         let Fraction = getFraction(event);
         idx = clamp(Math.floor(Fraction*numButtons), 0, numButtons - 1);
-        externalValueChange = false;
+        myRadio.externalValueChange = false;
         myRadio.setAttribute('data-val', idx);
     }
 
@@ -223,18 +224,17 @@ function radio (elem, config) {
     
     myRadio.setAttribute = function (key, value) {
         if (key == 'data-val') {
-            if (externalValueChange == true) {
+            if (myRadio.externalValueChange == true) {
                 value = clamp(parseFloat(value).toFixed(0), 0, numButtons - 1);
             }
             mySetAttribute.call(myRadio, key, value);
             drawRadio(value);
-            if (externalValueChange == false) {
+            if (myRadio.externalValueChange == false) {
                 myRadio.dispatchEvent(valChangeEvent);
-                externalValueChange == true;
+                myRadio.externalValueChange = true;
             }
         }
     }
-
 
     function setDirection () {
         switch (direction) {
