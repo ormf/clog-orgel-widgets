@@ -24,10 +24,12 @@
   (:export #:clog-dsp-widgets-initialize
            #:vslider #:hslider
            #:multi-slider
-           #:toggle
+           #:toggle #:button
            #:radio
            #:vradio #:hradio
            #:numbox
            #:vumeter
            #:multi-vu
-           #:get-clog-window))
+           #:get-clog-window
+           #:with-lists
+           #:pref-second))

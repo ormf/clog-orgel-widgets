@@ -342,6 +342,81 @@
                                (funcall val-change-cb (value btn) btn)))))
       btn)))
 
+(defun button (container &rest args
+               &key (style "") (size 10)
+                 (text-color "black")
+                 (background '("white" "orange"))
+                 (label "")
+                 val-change-cb
+               &allow-other-keys)
+  (with-lists (text-color background label)
+    (let* ((css (getf args :css))
+           (color (first text-color))
+           (active-color (pref-second text-color))
+           (bg (first background))
+           (active-bg (pref-second background))
+           (lbl (first label))
+           (active-lbl (pref-second label))
+           (btn (create-button
+                 container
+                 :class "bang"
+                 :css (append
+                       `(:align center
+                         :color ,color
+                         :margin ,(or (getf css :margin) "0px")
+                         :background ,bg
+                         :font-size ,(addpx size)
+                         :width ,(or
+                                  (getf css :width)
+                                  (getf args :width)
+                                  (addpx (* size 5)))
+                         :height ,(or
+                                   (getf css :height)
+                                   (getf args :height)
+                                   (addpx (* size 1.7))))
+                       (progn
+                         (dolist (prop '(:width :height)) (remf args prop))
+                         css))
+                 :content lbl
+                 :style style)))
+      (set-on-mouse-down
+       btn
+       (let ((color color) (bg bg) (lbl lbl)
+             (active-color active-color) (active-bg active-bg)
+             (active-lbl active-lbl))
+         (lambda (obj evt)
+           (declare (ignore obj evt))
+           (setf (style btn "background") active-bg)
+           (setf (style btn "color") active-color)
+           (setf (inner-html btn) active-lbl)
+           (if (functionp val-change-cb) (funcall val-change-cb))
+           (sleep 0.1)
+           (setf (style btn "background") bg)
+           (setf (style btn "color") color)
+           (setf (inner-html btn) lbl)
+           )))
+;;       (set-on-mouse-leave
+;;        btn
+;;        (let ((color color) (bg bg) (lbl lbl))
+;;          (lambda (obj)
+;;            (declare (ignore obj))
+;;            (setf (style btn "background") bg)
+;;            (setf (style btn "color") color)
+;;            (setf (inner-html btn) lbl)
+;;            )))
+;;       (set-on-mouse-up
+;;        btn
+;;        (let ((color color) (bg bg) (lbl lbl))
+;; ;;;         (declare (ignore lbl))
+;;          (lambda (obj evt)
+;;            (declare (ignore obj evt))
+;; ;;;                   (format t "prv clicked!~%")
+;;            (setf (style btn "background") bg)
+;;            (setf (style btn "color") color)
+;;            (setf (inner-html btn) lbl)
+;;            (if (functionp val-change-cb) (funcall val-change-cb)))))
+      btn)))
+
 (defun radio (container &rest args
               &key (style "")
                 (num 8)

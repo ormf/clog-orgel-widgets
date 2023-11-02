@@ -240,13 +240,13 @@ UserSelect
 
 (defun toggle (container &rest args
                &key (style "") (content "") (size 6)
-                           (color "black")
-                           (background "white")
-                           (selected-foreground "black")
-                           (selected-background "orange")
-                           (value-off "0.0")
-                           (value-on "1.0")
-                           receiver-fn (toggle-content "")
+                 (color "black")
+                 (background "white")
+                 (selected-foreground "black")
+                 (selected-background "orange")
+                 (value-off "0.0")
+                 (value-on "1.0")
+                 receiver-fn (toggle-content "")
                  slot
                  &allow-other-keys)
   (declare (ignore slot))
