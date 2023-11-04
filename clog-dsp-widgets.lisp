@@ -299,6 +299,7 @@
                  (text-color "black")
                  (background '("white" "orange"))
                  (label "")
+
                  (values '("0" "1"))
                  (value 0)
                  val-change-cb
@@ -341,6 +342,48 @@
                                (declare (ignore data))
                                (funcall val-change-cb (value btn) btn)))))
       btn)))
+
+(defun bang (container &rest args
+             &key (style "") (size 10)
+               (text-color "black")
+               (background '("white" "orange"))
+               (label "")
+               (flash-time "100")
+               action-cb
+               &allow-other-keys)
+  (with-lists (text-color background label)
+    (let* ((css (getf args :css))
+           (bng (create-bang
+                 container
+                 :class "bang"
+                 :css (append
+                       `(:align center
+                         :color ,(first text-color)
+                         :background ,(first background)
+                         :--textbox-selected-foreground ,(pref-second text-color)
+                         :--textbox-selected-background ,(pref-second background)
+                         :font-size ,(addpx size)
+                         :width ,(or (getf css :width) (addpx (* size 5)))
+                         :height ,(or (getf css :height) (addpx (* size 1.7))))
+                       (progn
+                         (dolist (prop '(:width :height)) (remf args prop))
+                         css))
+                 :style style)))
+      (let ((str (format nil "bang(~A, { ~{~{'~a': '~(~a~)'~}~^, ~} })"
+                         (jquery bng)
+                         `(("flashTime" ,flash-time)
+                           ("colorOff" ,(first text-color))
+                           ("backgroundOff" ,(first background))
+                           ("labelOff" ,(first label))
+                           ("colorOn" ,(pref-second text-color))
+                           ("backgroundOn" ,(pref-second background))
+                           ("labelOn" ,(pref-second label))))))
+        ;;      (break "~S" str)
+        (js-execute bng str))
+      (if action-cb
+          (progn
+            (clog::set-event bng "bang" (lambda (evt) (declare (ignore evt)) (funcall action-cb)))))
+      bng)))
 
 (defun button (container &rest args
                &key (style "") (size 10)
@@ -548,3 +591,8 @@
     (setf (meters mvu) (coerce vus 'vector))
     mvu))
 
+(defgeneric flash (clog-obj)
+  (:method ((obj clog-obj))
+    (execute obj "bang()"))
+  (:documentation "call the bang() function of clog-obj without triggering the bang
+event."))

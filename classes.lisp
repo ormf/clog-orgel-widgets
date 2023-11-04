@@ -40,6 +40,7 @@
 ;; create-toggle       ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 
+
 (defgeneric create-toggle (clog-obj
                            &rest args
                            &key content class style hidden html-id auto-place)
@@ -285,6 +286,47 @@ CLOG-OBJ"))
 (defmethod (setf idx-value) (value (obj clog-multivu) idx)
   (setf (attribute (aref (meters obj) idx) "data-val") value))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Implementation - clog-bang
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defclass clog-bang (clog-button)()
+  (:documentation "CLOG numbox Objects."))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;
+;; create-bang       ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defgeneric create-bang (clog-obj
+                           &rest args
+                           &key content class style hidden html-id auto-place)
+  (:documentation "Create a new CLOG-Bang as child of CLOG-OBJ with :CONTENT
+(default \"\") and if :AUTO-PLACE (default t) place-inside-bottom-of
+CLOG-OBJ"))
+
+(defmethod create-bang ((obj clog-obj)
+                          &rest args
+                          &key content class style hidden html-id (auto-place t)
+                          &allow-other-keys)
+  (declare (ignorable class style hidden))
+  (create-child obj (format-html-tag
+                     :button
+                     (args->attribute-plist args)
+                     content)
+                :clog-type  'clog-bang
+                :html-id    html-id
+                :auto-place auto-place))
+
+;;;;;;;;;;;
+;; value ;;
+;;;;;;;;;;;
+
+(defmethod doclick ((obj clog-bang))
+;;;   (attribute obj "data-val")
+  )
+
+
 (export '(CREATE-TOGGLE
           CREATE-RADIO
           CREATE-SLIDER
@@ -292,6 +334,7 @@ CLOG-OBJ"))
           CREATE-NUMBOX
           CREATE-VUMETER
           CREATE-MULTIVU
+          CREATE-BANG
           SLIDERS
           METERS
           IDX-VALUE
