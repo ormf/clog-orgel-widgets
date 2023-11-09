@@ -34,4 +34,6 @@
            #:multi-vu
            #:get-clog-window
            #:with-lists
-           #:pref-second))
+           #:pref-second
+           #:action-cb
+           #:val-change-cb))

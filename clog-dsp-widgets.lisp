@@ -81,35 +81,6 @@
 
 (defun any->js-array (colors)
   (list->js-array (ensure-list colors)))
-#|
-(defun hslider
-    (container &key (value 0.0) (min 0.0) (max 100.0) (thumbcolor "black") (color "#3071A9")
-                 (border-right-width 1) (background "#fff") width height
-                 val-change-cb)
-    "horizontal slider including behaviour."
-  (let ((hsl
-          (create-form-element
-           container :range
-           :class "hslider"
-           :style (format nil "--border-right-width: ~Apx;
---slider-thumb: ~A;--slider-color: ~A;
---slider-background: ~A;min-width: 0;flex: 1 1 0;--slider-thumb-height: 100%;
---slider-thumb-width: 2px;height: ~A;~@[width: ~A;~]"
-                          border-right-width thumbcolor color background
-                          (or height "10px") width)
-           :value (format nil "~a" value)
-           :min (format nil "~a" min)
-           :max (format nil "~a" max))))
-    (if val-change-cb
-        (set-on-input
-         hsl
-         (lambda (obj)
-           (declare (ignore obj))
-           (let ((val (value hsl)))
-;;;                                       (format t "vsl~a: ~a~%" (1+ idx) val)
-             (funcall val-change-cb val hsl)))))
-    hsl))
-|#
 
 (defun read-value (str)
   (read-from-string (cl-ppcre:regex-replace " *\([0-9.]+\).*" str "\\\1")))
@@ -382,7 +353,7 @@
         (js-execute bng str))
       (if action-cb
           (progn
-            (clog::set-event bng "bang" (lambda (evt) (declare (ignore evt)) (funcall action-cb)))))
+            (clog::set-event bng "bang" (lambda (evt) (declare (ignore evt)) (funcall action-cb bng)))))
       bng)))
 
 (defun button (container &rest args
