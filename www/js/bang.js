@@ -16,7 +16,6 @@ function bang (elem, config) {
     var backgroundOn     = config.backgroundOn || 'rgba(120,120,120,1.0)';
     var labelOn          = config.labelOn || '';
 
-    myBang.externalValueChange = true;
 
     // override setAttribute
 //    const mySetAttribute = myBang.setAttribute;
@@ -45,13 +44,54 @@ function bang (elem, config) {
     }
 
     function bang() {
-        console.log('bang')
+        // console.log('bang')
         flashBang();
         if (myBang.externalValueChange == false) {
             myBang.dispatchEvent(bangEvent);
         }
     }
 
+    $.pulseBangOn = function () {
+        pulseBangOn();
+    }
+
+    $.pulseBangOff = function () {
+        pulseBangOff();
+    }
+
+    function pulseBangOn() {
+        myBang.pulseActive = true;
+        pulseBang();
+    }
+ 
+    function pulseBangOff() {
+        myBang.pulseActive = false;
+        myBang.textContent = myBang.labelOff;
+        myBang.style.color = myBang.colorOff;
+        myBang.style.background = myBang.backgroundOff;
+     }
+
+    
+    async function pulseBang() {
+        if (myBang.pulseActive == true) {
+            if (myBang.pulseState == false) {
+                myBang.textContent = myBang.labelOn;
+                myBang.style.color = myBang.colorOn;
+                myBang.style.background = myBang.backgroundOn;
+                myBang.pulseState = true;
+            }
+            else {
+                myBang.textContent = myBang.labelOff;
+                myBang.style.color = myBang.colorOff;
+                myBang.style.background = myBang.backgroundOff;
+                myBang.pulseState = false;
+            }
+            await sleep(myBang.pulseTime);
+        }
+    }
+
+ 
+    
     async function flashBang() {
         if (myBang.flashTime > 0) {
             myBang.textContent = myBang.labelOn;
@@ -59,6 +99,7 @@ function bang (elem, config) {
             myBang.style.background = myBang.backgroundOn;
             
             await sleep(myBang.flashTime);
+
             myBang.textContent = myBang.labelOff;
             myBang.style.color = myBang.colorOff;
             myBang.style.background = myBang.backgroundOff;
@@ -82,6 +123,10 @@ function bang (elem, config) {
     
     function init () {
         myBang.flashTime = flashTime;
+        myBang.externalValueChange = true;
+        myBang.pulseState = false;
+        myBang.pulseActive = false;
+        myBang.pulseTime = 250;
         myBang.colorOff = colorOff;
         myBang.backgroundOff = backgroundOff;
         myBang.labelOff = labelOff;

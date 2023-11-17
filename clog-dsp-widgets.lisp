@@ -567,3 +567,13 @@
     (execute obj "bang()"))
   (:documentation "call the bang() function of clog-obj without triggering the bang
 event."))
+
+(defgeneric pulse-on (clog-obj)
+  (:method ((obj clog-obj))
+    (execute obj "pulseOn()"))
+  (:documentation "call the pulseOn() function of clog-obj."))
+
+(defgeneric pulse-off (clog-obj)
+  (:method ((obj clog-obj))
+    (execute obj "pulseOff()"))
+  (:documentation "call the pulseOff() function of clog-obj."))

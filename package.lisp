@@ -27,6 +27,8 @@
            #:toggle #:button
            #:bang
            #:flash
+           #:pulse-on
+           #:pulse-off
            #:radio
            #:vradio #:hradio
            #:numbox
