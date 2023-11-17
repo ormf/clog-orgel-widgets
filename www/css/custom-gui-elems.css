@@ -10,6 +10,8 @@
     --slider-thumb-width: 100%;
     --textbox-selected-background: #3071A9;
     --textbox-selected-foreground: white;
+    --textbox-unselected-background: #3071A9;
+    --textbox-unselected-foreground: white;
     --textbox-caret-color: white;
     --toggle-background: white;
     --vu-background: #444;
@@ -27,7 +29,7 @@ div {
 button {
     border-radius: 0px;
     border: thin solid black;
-    margin: 2px;
+    margin: 0;
   background-color: #fff; /* Green */
   /* border: none; */
   color: black;

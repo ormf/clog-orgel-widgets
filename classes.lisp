@@ -327,6 +327,23 @@ CLOG-OBJ"))
   )
 
 
+(defgeneric background (clog-element &key default-answer)
+  (:documentation "Get/Setf background style."))
+
+(defmethod background ((obj clog-element) &key (default-answer nil))
+  (style obj "background" :default-answer default-answer))
+
+(defgeneric (setf background) (value clog-element)
+  (:documentation "Set background style."))
+
+(defmethod (setf background) (value (obj clog-element))
+  (setf (style obj "background")
+        (js-query obj (format nil (if (zerop value)
+                                      "~A.backgroundOff"
+                                      "~A.backgroundOn")
+                              (script-id obj))))  
+  value)
+
 (export '(CREATE-TOGGLE
           CREATE-RADIO
           CREATE-SLIDER
@@ -339,6 +356,7 @@ CLOG-OBJ"))
           METERS
           IDX-VALUE
           MIN-VAL
-          MAX-VAL)
+          MAX-VAL
+          BACKGROUND)
         'CLOG)
 

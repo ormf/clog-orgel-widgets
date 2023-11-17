@@ -53,14 +53,16 @@ function bang (elem, config) {
     }
 
     async function flashBang() {
-        myBang.textContent = myBang.labelOn;
-        myBang.style.color = myBang.colorOn;
-        myBang.style.background = myBang.backgroundOn;
-        
-        await sleep(myBang.flashTime);
-        myBang.textContent = myBang.labelOff;
-        myBang.style.color = myBang.colorOff;
-        myBang.style.background = myBang.backgroundOff;
+        if (myBang.flashTime > 0) {
+            myBang.textContent = myBang.labelOn;
+            myBang.style.color = myBang.colorOn;
+            myBang.style.background = myBang.backgroundOn;
+            
+            await sleep(myBang.flashTime);
+            myBang.textContent = myBang.labelOff;
+            myBang.style.color = myBang.colorOff;
+            myBang.style.background = myBang.backgroundOff;
+        }
     }
 
 
