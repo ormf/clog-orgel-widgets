@@ -9,6 +9,7 @@ function bang (elem, config) {
     
     const bangEvent = new Event('bang');
     var flashTime        = config.flashTime || '100'; // flash time in ms
+    var pulseTime        = config.pulseTime || '250'; // pulse time in ms
     var colorOff         = config.colorOff || 'black';
     var backgroundOff    = config.backgroundOff || 'white';
     var labelOff         = config.labelOff || '';
@@ -112,10 +113,10 @@ function bang (elem, config) {
     
     function init () {
         myBang.flashTime = flashTime;
+        myBang.pulseTime = pulseTime;
         myBang.externalValueChange = true;
         myBang.pulseState = false;
         myBang.pulseActive = false;
-        myBang.pulseTime = 250;
         myBang.colorOff = colorOff;
         myBang.backgroundOff = backgroundOff;
         myBang.labelOff = labelOff;
