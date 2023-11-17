@@ -39,32 +39,20 @@ function bang (elem, config) {
     return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    $.bang = function () {
-        bang();
-    }
-
     function bang() {
-        // console.log('bang')
+        console.log('bang')
         flashBang();
         if (myBang.externalValueChange == false) {
             myBang.dispatchEvent(bangEvent);
         }
     }
 
-    $.pulseBangOn = function () {
-        pulseBangOn();
-    }
-
-    $.pulseBangOff = function () {
-        pulseBangOff();
-    }
-
-    function pulseBangOn() {
+    function pulseOn() {
         myBang.pulseActive = true;
         pulseBang();
     }
  
-    function pulseBangOff() {
+    function pulseOff() {
         myBang.pulseActive = false;
         myBang.textContent = myBang.labelOff;
         myBang.style.color = myBang.colorOff;
@@ -87,6 +75,7 @@ function bang (elem, config) {
                 myBang.pulseState = false;
             }
             await sleep(myBang.pulseTime);
+            pulseBang();
         }
     }
 
@@ -151,6 +140,8 @@ function bang (elem, config) {
 //        drawBang(val);
         myBang.externalValueChange = true;
         myBang.bang = bang;
+        myBang.pulseOn = pulseOn;
+        myBang.pulseOff = pulseOff;
     }
 
     init();
