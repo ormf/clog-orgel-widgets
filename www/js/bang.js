@@ -50,6 +50,7 @@ function bang (elem, config) {
 
     function pulseOn(ms) {
         myBang.pulseActive = true;
+        console.log("pulseTime: ", ms);
         pulseBang(ms);
     }
  
@@ -76,7 +77,7 @@ function bang (elem, config) {
                 myBang.pulseState = false;
             }
             await sleep(ms);
-            pulseBang();
+            pulseBang(ms);
         }
     }
 
@@ -113,7 +114,7 @@ function bang (elem, config) {
     
     function init () {
         myBang.flashTime = flashTime;
-        myBang.pulseTime = pulseTime;
+//        myBang.pulseTime = pulseTime;
         myBang.externalValueChange = true;
         myBang.pulseState = false;
         myBang.pulseActive = false;
