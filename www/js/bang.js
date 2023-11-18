@@ -9,7 +9,7 @@ function bang (elem, config) {
     
     const bangEvent = new Event('bang');
     var flashTime        = config.flashTime || '100'; // flash time in ms
-    var pulseTime        = config.pulseTime || '250'; // pulse time in ms
+//    var pulseTime        = config.pulseTime || '250'; // pulse time in ms
     var colorOff         = config.colorOff || 'black';
     var backgroundOff    = config.backgroundOff || 'white';
     var labelOff         = config.labelOff || '';
@@ -48,9 +48,9 @@ function bang (elem, config) {
         }
     }
 
-    function pulseOn() {
+    function pulseOn(ms) {
         myBang.pulseActive = true;
-        pulseBang();
+        pulseBang(ms);
     }
  
     function pulseOff() {
@@ -61,7 +61,7 @@ function bang (elem, config) {
      }
 
     
-    async function pulseBang() {
+    async function pulseBang(ms) {
         if (myBang.pulseActive == true) {
             if (myBang.pulseState == false) {
                 myBang.textContent = myBang.labelOn;
@@ -75,7 +75,7 @@ function bang (elem, config) {
                 myBang.style.background = myBang.backgroundOff;
                 myBang.pulseState = false;
             }
-            await sleep(myBang.pulseTime);
+            await sleep(ms);
             pulseBang();
         }
     }

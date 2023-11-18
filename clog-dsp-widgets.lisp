@@ -568,9 +568,9 @@
   (:documentation "call the bang() function of clog-obj without triggering the bang
 event."))
 
-(defgeneric pulse-on (clog-obj)
-  (:method ((obj clog-obj))
-    (execute obj "pulseOn()"))
+(defgeneric pulse-on (clog-obj &optional freq)
+  (:method ((obj clog-obj) &optional (freq 2))
+    (execute obj (format nil "pulseOn(~A)" (round (/ 1000 freq 2.0)))))
   (:documentation "call the pulseOn() function of clog-obj."))
 
 (defgeneric pulse-off (clog-obj)
