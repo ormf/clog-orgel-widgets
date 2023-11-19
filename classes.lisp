@@ -333,15 +333,11 @@ CLOG-OBJ"))
 (defmethod background ((obj clog-element) &key (default-answer nil))
   (style obj "background" :default-answer default-answer))
 
-(defgeneric (setf background) (value clog-element)
-  (:documentation "Set background style."))
+(defgeneric highlight (clog-element value)
+  (:documentation "Hightlight element (0 unhighlights, all other values highlight)."))
 
-(defmethod (setf background) (value (obj clog-element))
-  (setf (style obj "background")
-        (js-query obj (format nil (if (zerop value)
-                                      "~A.backgroundOff"
-                                      "~A.backgroundOn")
-                              (script-id obj))))  
+(defmethod highlight ((obj clog-element) value)
+  (execute obj (format nil "setBackground(~A)" value))  
   value)
 
 (export '(CREATE-TOGGLE

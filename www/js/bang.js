@@ -97,7 +97,14 @@ function bang (elem, config) {
         }
     }
 
+    function highlight (v) {
+        if (v == 0)
+            myBang.style.background = myBang.backgroundOff;
+        else
+            myBang.style.background = myBang.backgroundOn;
+    }
 
+    
     function mouseDownListener (event) {
         myBang.externalValueChange = false;
         bang();
@@ -143,7 +150,8 @@ function bang (elem, config) {
         myBang.externalValueChange = true;
         myBang.bang = bang;
         myBang.pulseOn = pulseOn;
-        myBang.pulseOff = pulseOff;
+        myBang.pulseOff = pulseOff
+        myBang.highlight = highlight;
     }
 
     init();
