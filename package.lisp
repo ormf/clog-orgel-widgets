@@ -29,6 +29,7 @@
            #:flash
            #:pulse-on
            #:pulse-off
+           #:highlight
            #:radio
            #:vradio #:hradio
            #:numbox
