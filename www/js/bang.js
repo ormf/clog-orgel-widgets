@@ -41,7 +41,7 @@ function bang (elem, config) {
     }
 
     function bang() {
-        console.log('bang')
+//        console.log('bang')
         flashBang();
         if (myBang.externalValueChange == false) {
             myBang.dispatchEvent(bangEvent);

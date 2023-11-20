@@ -582,5 +582,5 @@ event."))
   (:documentation "Hightlight element (0 unhighlights, all other values highlight)."))
 
 (defmethod highlight ((obj clog-element) value)
-  (execute obj (format nil "setBackground(~A)" value))  
+  (execute obj (format nil "highlight(~A)" value))  
   value)
