@@ -169,8 +169,7 @@
                                   :display "flex"
                                   :padding "0.5pt")
                                 css
-                                (unless (getf css :height) `(:height ,*default-vslider-height*))
-                                (unless (getf css :width) `(:width ,(format nil "~apx" (* num 10)))))
+                                (unless (getf css :height) `(:height ,*default-vslider-height*)))
                           :data-num-sliders num
                           :data-min min
                           :data-max max
@@ -532,7 +531,7 @@
 
 (defun multi-vu (container &key (num 8) (width 80) (height 100)  (background "transparent") (direction :up) (border "")
                              (inner-background "var(--vu-background)") (inner-border "") inner-padding inner-padding-bottom
-                             led-colors css
+                             led-colors display-map css
                              val-change-cb)
   (declare (ignorable val-change-cb))
   (let* ((mvu (create-multivu container
@@ -550,6 +549,7 @@
                 collect (vumeter
                          mvu
                          :led-colors led-colors
+                         :display-map display-map
                          :direction direction
                          :border inner-border
                          :data-db 0
