@@ -579,7 +579,7 @@ event."))
   (:documentation "call the pulseOff() function of clog-obj."))
 
 (defgeneric highlight (clog-element value)
-  (:documentation "Hightlight element (0 unhighlights, all other values highlight)."))
+  (:documentation "Highlight element (0 unhighlights, all other values highlight)."))
 
 (defmethod highlight ((obj clog-element) value)
   (execute obj (format nil "highlight(~A)" value))  

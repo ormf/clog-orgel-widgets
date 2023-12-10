@@ -40,7 +40,7 @@ function slider(elem, config){
         slider = elem;
 
     function disableDrag (elem) {
-        elem.ondragstart = () => { return false; }
+       // elem.ondragstart = undefined
     }
 
     var sliderBar = document.createElement("div");
@@ -69,6 +69,9 @@ function slider(elem, config){
     var valueLogRatio;
     var calcBarSize;
     var mouseMoveListener;
+    var oldValue = -1;
+    var fraction = -1;
+    var oldFraction = -2;
 
     var style = window.getComputedStyle(slider, null);
     var thumbColor = style.getPropertyValue('--thumb-color');
@@ -88,7 +91,7 @@ function slider(elem, config){
     }
 
     function getYFraction (event) {
-        let localYFrac = (sliderHeight + slider.offsetTop - event.clientY) / sliderHeight;
+        let localYFrac = (sliderHeight + slider.getBoundingClientRect().top - event.clientY) / sliderHeight;
         return clamp(localYFrac, 0, 1);
     }
 
@@ -97,7 +100,7 @@ function slider(elem, config){
     }
 
     function getXFraction (event) {
-        let localXFrac = ((event.clientX - slider.offsetLeft)) / sliderWidth;
+        let localXFrac = ((event.clientX - slider.getBoundingClientRect().left)) / sliderWidth;
         return clamp(localXFrac, 0, 1);
     }
 
@@ -145,10 +148,10 @@ function slider(elem, config){
 
     slider.setBarSize = function (fraction) {
         // value change triggered by mouse interaction in the gui.
-        if (fraction != oldFraction) {
+        if (fraction !== oldFraction) {
             oldFraction = fraction;
             let newValue = valFunction(fraction).toFixed(3);
-            if (newValue != oldValue) {
+            if (newValue !== oldValue) {
                 slider.externalValueChange = false;
                 calcBarSize(fraction);
                 slider.setAttribute('data-val', newValue);

@@ -139,12 +139,12 @@ function multislider(elem, config) {
     }
 
     function getYFraction (event) {
-        let localYFrac = (multisliderHeight + multislider.offsetTop - event.clientY) / multisliderHeight;
+        let localYFrac = (multisliderHeight + multislider.getBoundingClientRect().top - event.clientY) / multisliderHeight;
         return clamp(localYFrac, 0, 1);
     }
 
     function getXFraction (event) {
-        let localXFrac = ((event.clientX - multislider.offsetLeft)) / multisliderWidth;
+        let localXFrac = (event.clientX - multislider.getBoundingClientRect().left) / multisliderWidth;
         return clamp(localXFrac, 0, 1);
     }
 
@@ -219,7 +219,6 @@ function multislider(elem, config) {
             else {
                 for (let i = idx; i < lastIdx;i++) {
                     let f = fraction + ((i-idx)/dIdx * dFraction);
-                    sliders[i].setBarSize(f);
                     sliders[i].setBarSize(f);
                 }
             }

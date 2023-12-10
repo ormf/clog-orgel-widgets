@@ -1,5 +1,5 @@
 function vumeter(elem, config){
-
+//    console.log(elem, Date.now())
     // Settings
     var max             = config.max || 100;
     var boxCount        = config.boxCount || 40;
@@ -84,33 +84,37 @@ function vumeter(elem, config){
         return Math.max(min, Math.min(number, max));
     }
     
-    function createLedContainer (parent) {
-        let vuLedContainer = document.createElement("div");
-        vuLedContainer.style.height = "100%";
-        vuLedContainer.style.width = "100%";
-        vuLedContainer.style.padding = "2px";
-        vuLedContainer.style.display = "flex";
-        vuLedContainer.style.flexDirection = "column";
-        vuLedContainer.style.padding = vuInnerPadding;
-        vuLedContainer.style.paddingBottom = vuInnerPaddingBottom;
-        vuLedContainer.style.justifyContent = "space-between";
-        parent.appendChild(vuLedContainer);
-        parent.ledContainer = vuLedContainer;
-    }
+    // function createLedContainer (parent) {
+    //     let vuLedContainer = document.createElement("div");
+    //     vuLedContainer.style.height = "100%";
+    //     vuLedContainer.style.width = "100%";
+    //     vuLedContainer.style.padding = "2px";
+    //     vuLedContainer.style.display = "flex";
+    //     vuLedContainer.style.flexDirection = "column";
+    //     vuLedContainer.style.padding = vuInnerPadding;
+    //     vuLedContainer.style.paddingBottom = vuInnerPaddingBottom;
+    //     vuLedContainer.style.justifyContent = "space-between";
+    //     parent.appendChild(vuLedContainer);
+    //     parent = vuLedContainer;
+    // }
 
     function createLeds (parent) {
-        let leds = [];
-        createLedContainer(parent);
-        for (i = 39;i>=0;i--) {
-            leds[i] = document.createElement("span");
-            leds[i].style.width = "100%";
-            leds[i].style.height = "100%";
-            leds[i].style.border = "thin solid var(--vu-background)";
-            leds[i].style.backgroundColor = "var(--vu-background)";
-            if (i < 39) { leds[i].style.borderTopStyle = "none"; }
-            parent.ledContainer.appendChild(leds[i]);
-            parent.leds = leds;
-        }
+        let leds = document.createElement("div");
+        leds.setAttribute("class", "vubar");
+        leds.style.width = "100%";
+//        leds.style.height = "100%";
+        leds.style.backgroundSize = "10px 80px";
+        leds.style.backgroundImage = "repeating-linear-gradient(to top, #000 0%, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 2.5px),linear-gradient(to top, rgba(0, 85, 100, 1.0) 0%, rgba(0, 102, 128, 1.0) 2%, rgba(0, 136, 170, 1.0) 10%, rgba(0, 170, 212, 1.0) 17.5%, rgba(0, 190, 245, 1.0) 25.0%, rgba(50, 202, 255, 1.0) 32.5%, rgba(85, 211, 255, 1.0) 40.0%, rgba(128, 222, 255, 1.0) 47.5%, rgba(170, 235, 255, 1.0) 55.0%, rgba(213, 246, 255, 1.0) 62.5%, rgba(255, 170, 170, 1.0) 70.0%, rgba(255, 128, 128, 1.0) 77.5%, rgba(255, 85, 85, 1.0) 85.0%, rgba(255, 42, 42, 1.0) 92.5%, rgba(255, 0, 42, 1.0) 100%)";
+        leds.style.backgroundPosition = "bottom";
+
+        leds.style.border = "thin solid var(--vu-background)";
+        leds.style.backgroundColor = "transparent";
+        leds.style.position = "absolute";
+        leds.style.left = "0";
+        leds.style.bottom = "0";
+        
+        parent.appendChild(leds);
+        parent.vuBar = leds;
     }
 
 
@@ -125,51 +129,32 @@ function vumeter(elem, config){
 //        vuBar.style.display = "flex";
 //        vuBar.style.flexDirection = "column";
 //        vuBar.style.justifyContent = "space-between";
-        parent.ledContainer.appendChild(vuBar);
+        parent.appendChild(vuBar);
         parent.vuBar = vuBar;
 
     }
 
     function setBarSizeY(db) {
 //        console.log(((db/112)*vuHeight) + 'px');
-        vuMeter.vuBar.style.height = ((db/112)*vuHeight) + 'px';
+        vuMeter.vuBar.style.height = ((db/1.12)*vuHeight) + '%';
     }
     
     function setBarSizeX(db) {
-        vuMeter.vuBar.style.width = ((db/112)*vuWidth) + 'px';
+        vuMeter.vuBar.style.width = ((db/1.12)*vuWidth) + '%';
     }
     
     function drawBar () {
         var targetDB = clamp((100+parseInt(vuMeter.getAttribute("data-db"), 10)), 0, 112);
 //        console.log('drawBar!' + targetDB + ' ' + colors[targetDB]);
         setBarSize(targetDB); 
-        vuMeter.vuBar.style.backgroundColor = colors[dbLedIdxLookup[targetDB]];
+//        vuMeter.vuBar.style.backgroundColor = colors[dbLedIdxLookup[targetDB]];
     }
 
     function drawLed () {
         let leds = vuMeter.leds;
         var targetDB = clamp((100+parseInt(vuMeter.getAttribute("data-db"), 10)), 0, 112);
-
-//        console.log('redraw! ' + vuMeter.getAttribute("data-db") + ', dB: ' + targetDB);
-        
-        var targetVal = dbLedIdxLookup[targetDB];
-
-        if (targetVal != lastVal) {
-            if (targetVal > lastVal) {
-                for (var i = lastVal;i < targetVal;i++) {
-                    leds[i].style.backgroundColor = colors[i];
-//                    console.log('i: ' + i + ', on: ' + leds[i].style.backgroundColor + ' ' + colors[i]);
-                }
-            }
-            else {
-                for (var i = targetVal;i < lastVal;i++) {
-                    leds[i].style.backgroundColor = "var(--vu-background-color)";
-//                    console.log('i: ' + i + ', off: ' + leds[i].style.backgroundColor);
-                }
-            }
-        
-            lastVal = targetVal;
-        }
+        setBarSize(targetDB);        
+        lastVal = targetDB;
     };
     
     const mySetAttribute = vuMeter.setAttribute;
@@ -259,25 +244,26 @@ function vumeter(elem, config){
         switch (vuDirection) {
         case 'right' :
             setBarSize = setBarSizeX;
-            vuMeter.ledContainer.style.flexDirection = "row";
+            vuMeter.style.flexDirection = "row";
             break;
         case 'left' :
             setBarSize = setBarSizeX;
-            vuMeter.ledContainer.style.flexDirection = "row-reverse";
+            vuMeter.style.flexDirection = "row-reverse";
             break;
         case 'down' :
             setBarSize = setBarSizeY;
-            vuMeter.ledContainer.style.flexDirection = "column";
+            vuMeter.style.flexDirection = "column";
             break;
         default : // 'up'
             setBarSize = setBarSizeY;
-            vuMeter.ledContainer.style.flexDirection = "column-reverse";
+            vuMeter.style.flexDirection = "column-reverse";
             break;
         }
     }
 
     function init() {
         vuMeter.style.background = 'var(--vu-background)';
+        vuMeter.style.position = 'relative';
         vuHeight = parseFloat(style.height);
         vuWidth = parseFloat(style.width);
 //        console.log('height: ' + vuHeight + ', width: ' + vuWidth + ' ' + vuType);
@@ -301,17 +287,16 @@ function vumeter(elem, config){
         setLedMapping();
         switch(vuType) {
         case 'led' :
-//            console.log('ledColors: ' + ledColors);
             drawVu = drawLed;
             createLeds(vuMeter);
             break;
         case 'bar' :
-//            console.log('drawBar: ' + ledColors);
+            console.log('vuType: bar');
             createBar(vuMeter);
-            setBarDirection();
             drawVu = drawBar;
             break;
         }
+        setBarDirection();
         drawVu();
     }
     

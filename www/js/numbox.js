@@ -160,8 +160,9 @@ function numbox(elem){
         if (moved == false) {
             { // called only once after a click and subsequent move.
                 dragging = true;
-//                console.log('dragging1');
-                numScale = calcNumScale(event.clientX-offsetLeft);
+                console.log('startX: ', mouseStartX, 'clientY: ', event.clientY);
+                console.log('startY: ', mouseStartY, 'clientX: ', event.clientX);
+                numScale = calcNumScale(event.clientX-numbox.getBoundingClientRect().left);
                 numbox.style.setProperty('--textbox-selected-background', background);
                 numbox.style.setProperty('--textbox-selected-foreground', foreground);
                 numbox.style.setProperty('--textbox-caret-color', 'transparent');
@@ -179,8 +180,10 @@ function numbox(elem){
         }
         else { // called while dragging
 //            console.log('dragging2 ' + numScale + ' ' + event.clientY + ' ' + lastValue + ' ' + lastY);
+            console.log('startX: ', mouseStartX, 'clientY: ', event.clientY);
+            console.log('startY: ', mouseStartY, 'clientX: ', event.clientX);
             if (event.shiftKey) {
-                numScale = calcNumScale(event.clientX-offsetLeft);
+                numScale = calcNumScale(event.clientX - numbox.getBoundingClientRect().left);
             }
             numbox.currValue = checkMinMax(lastValue + (lastY - event.clientY) * numScale);
             lastY = event.clientY;

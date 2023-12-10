@@ -18,8 +18,13 @@
     /* --slider-background: #ff0000; */
 }
 
+html {
+    overflow-x: unset;
+}
+
 body {
     font-size: 10px;
+    overflow: auto;
 }
 
 div {
