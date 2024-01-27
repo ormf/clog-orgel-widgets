@@ -18,6 +18,6 @@
 ;;;
 ;;; **********************************************************************
 
-(defpackage #:clog-dsp-widgets-example
-  (:use #:cl #:clog #:clog-gui #:clog-dsp-widgets))
+(defpackage #:clog-orgel-widgets-example
+  (:use #:cl #:clog #:clog-gui #:clog-orgel-widgets))
 

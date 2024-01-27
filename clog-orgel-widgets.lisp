@@ -1,5 +1,5 @@
 ;;; 
-;;; clog-dsp-widgets.lisp
+;;; clog-orgel-widgets.lisp
 ;;;
 ;;; **********************************************************************
 ;;; Copyright (c) 2023 Orm Finnendahl <orm.finnendahl@selma.hfmdk-frankfurt.de>
@@ -556,7 +556,7 @@
                          :width "100%"
                          :height "100%"
                          :border-right-width (if (< n (1- num)) 0 1)
-                         :background (or inner-background background "var(--vu-background)")
+                         :background (or inner-background background)
                          :inner-padding inner-padding
                          :inner-padding-bottom inner-padding-bottom))))
     (setf (meters mvu) (coerce vus 'vector))

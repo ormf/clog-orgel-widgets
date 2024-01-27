@@ -18,12 +18,12 @@
 ;;;
 ;;; **********************************************************************
 
-(asdf:defsystem #:clog-dsp-widget-example
-  :description "widgets for audio dsp guis in clog."
+(asdf:defsystem #:clog-orgel-widget-example
+  :description "widgets for papierrohrorgel gui in clog."
   :author "Orm Finnendahl <orm.finnendahl@selma.hfmdk-frankfurt.de>"
   :license  "gpl 2.0 or later"
   :version "0.0.1"
-  :depends-on (#:clog #:clog-dsp-widgets)
+  :depends-on (#:clog #:clog-orgel-widgets)
   :serial t
   :components ((:module "examples"
                 :serial t

@@ -18,9 +18,9 @@
 ;;;
 ;;; **********************************************************************
 
-(in-package :clog-dsp-widgets)
+(in-package :clog-orgel-widgets)
 
-(defun clog-dsp-widgets-initialize (body)
+(defun clog-orgel-widgets-initialize (body)
   (clog-gui-initialize body)
   (load-script (html-document body) "js/vumeter.js")
   (load-script (html-document body) "js/toggle.js")

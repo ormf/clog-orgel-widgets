@@ -2,7 +2,7 @@
 ;;
 ;;;; Copyright (c) 2023 Orm Finnendahl <orm.finnendahl@selma.hfmdk-frankfurt.de>
 
-(asdf:defsystem #:clog-dsp-widgets
+(asdf:defsystem #:clog-orgel-widgets
   :description "widgets for audio dsp guis in clog."
   :author "Orm Finnendahl <orm.finnendahl@selma.hfmdk-frankfurt.de>"
   :license  "gpl 2.0 or later"
@@ -13,5 +13,5 @@
                (:file "globals")
                (:file "clog-redefs")
                (:file "classes")
-               (:file "clog-dsp-widgets")
+               (:file "clog-orgel-widgets")
                (:file "init")))

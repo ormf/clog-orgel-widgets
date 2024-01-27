@@ -139,12 +139,14 @@ function multislider(elem, config) {
     }
 
     function getYFraction (event) {
-        let localYFrac = (multisliderHeight + multislider.getBoundingClientRect().top - event.clientY) / multisliderHeight;
+        let boundingClientRect = multislider.getBoundingClientRect();
+        let localYFrac = (boundingClientRect.height + boundingClientRect.top - event.clientY) / boundingClientRect.height;
         return clamp(localYFrac, 0, 1);
     }
 
     function getXFraction (event) {
-        let localXFrac = (event.clientX - multislider.getBoundingClientRect().left) / multisliderWidth;
+        let boundingClientRect = multislider.getBoundingClientRect();
+        let localXFrac = (event.clientX - boundingClientRect.left) / boundingClientRect.width;
         return clamp(localXFrac, 0, 1);
     }
 

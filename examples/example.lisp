@@ -17,9 +17,9 @@
 ;;; GNU General Public License for more details.
 ;;;
 ;;; **********************************************************************
-
+;;;
 ;;; 
-;;; clog-dsp-widget-example.lisp
+;;; clog-orgel-widget-example.lisp
 ;;;
 ;;; **********************************************************************
 ;;; Copyright (c) 2023 Orm Finnendahl <orm.finnendahl@selma.hfmdk-frankfurt.de>
@@ -38,9 +38,9 @@
 ;;;
 ;;; **********************************************************************
 
-(ql:quickload :clog-dsp-widgets-example)
+(ql:quickload :clog-orgel-widgets-example)
 
-(in-package :clog-dsp-widgets-example)
+(in-package :clog-orgel-widgets-example)
 
 (defparameter *my-vumeter* nil)
 (defparameter *my-slider* nil)
@@ -50,7 +50,7 @@
 (defparameter *my-multislider* nil)
 
 (defun on-new-window (body)
-  (clog-dsp-widgets-initialize body)
+  (clog-orgel-widgets-initialize body)
   (setf (title (html-document body)) "Clog DSP Widget Example")
   (add-class body "w3-blue-grey") ;;; background color
 
@@ -103,14 +103,14 @@
 (defun start-dsp-widgets-example ()
   "Start Orgel Gui."
   (initialize #'on-new-window
-              :static-root (merge-pathnames "./www/" (asdf:system-source-directory :clog-dsp-widgets)))
+              :static-root (merge-pathnames "./www/" (asdf:system-source-directory :clog-orgel-widgets)))
   (open-browser))
 
 (start-dsp-widgets-example)
 
 
 (defun on-new-window (body)
-  (clog-dsp-widgets-initialize body)
+  (clog-orgel-widgets-initialize body)
   (setf (title (html-document body)) "Clog DSP Widget Example")
   (add-class body "w3-blue-grey") ;;; background color
 

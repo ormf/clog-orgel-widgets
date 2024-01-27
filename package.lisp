@@ -18,7 +18,7 @@
 ;;;
 ;;; **********************************************************************
 
-(defpackage #:clog-dsp-widgets
+(defpackage #:clog-orgel-widgets
   (:use #:cl #:clog #:clog-gui)
   (:shadowing-import-from #:clog #:rotate)
   (:export #:clog-dsp-widgets-initialize

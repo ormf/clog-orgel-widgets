@@ -18,7 +18,7 @@
 ;;;
 ;;; **********************************************************************
 
-(in-package :clog-dsp-widgets)
+(in-package :clog-orgel-widgets)
 
 (defvar *default-slider-thumb-color* "black")
 (defvar *default-slider-bar-color* "transparent")
