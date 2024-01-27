@@ -1,5 +1,5 @@
 
-* clog-dsp-widgets
+* clog-orgel-widgets
 
 This project facilitates creating dsp guis in [[https://en.wikipedia.org/wiki/Common_Lisp][Common Lisp]], by
 providing sliders, toggles, numboxes, vu-meters, etc., very similar to
@@ -17,6 +17,10 @@ devices like mobile phones, tablets, laptops, etc. The project depends
 on [[https://github.com/rabbibotton/clog][CLOG]] by David Botton, which does the heavy lifting to handle the
 connection between Common Lisp and Javascript/CSS/Html5.
 
+This is an old version, used for the papierrohrorgel developed at the
+HfMDK Frankfurt. For the improved, current, non-compatible version,
+see [[https://github.com/ormf/clog-dsp-widgets.git][clog-dsp-widgets]].
+
 ** License
 
 gpl 2.0 or later
@@ -33,12 +37,12 @@ gpl 2.0 or later
    Then
 
    #+BEGIN_SRC lisp
-     (ql:quickload :clog-dsp-widgets)
+     (ql:quickload :clog-orgel-widgets)
    #+END_SRC
 
 ** Example
 
-   Check the file =example/clog-dsp-widgets-example.lisp= for an usage
+   Check the file =example/clog-orgel-widgets-example.lisp= for an usage
    example.
    
 
