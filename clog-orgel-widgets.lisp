@@ -18,7 +18,7 @@
 ;;;
 ;;; **********************************************************************
 
-(in-package :clog-dsp-widgets)
+(in-package :clog-orgel-widgets)
 
 (defun get-clog-window (elem)
   (window (gethash

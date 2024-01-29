@@ -21,7 +21,7 @@
 (defpackage #:clog-orgel-widgets
   (:use #:cl #:clog #:clog-gui)
   (:shadowing-import-from #:clog #:rotate)
-  (:export #:clog-dsp-widgets-initialize
+  (:export #:clog-orgel-widgets-initialize
            #:vslider #:hslider
            #:multi-slider
            #:toggle #:button
