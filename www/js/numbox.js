@@ -203,6 +203,7 @@ function numbox(elem){
                 ((numbox.value.substring(0,1) != '-') || numbox.selectionEnd > 0)) || keyCode == 13) {
             if (keyCode == 13) {
                 numbox.blur();
+                numbox.off("mousemove");
                 numbox.removeEventListener('keydown', this);
                 document.addEventListener('mousedown', mouseDownListener);
             }
