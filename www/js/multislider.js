@@ -36,6 +36,7 @@ function multislider(elem, config) {
     var offsetTop = multislider.offsetTop;
     var offsetLeft = multislider.offsetLeft;
     var multisliderHeight, multisliderWidth;
+    var multiSliderTracking = 0;
     var minValue, maxValue, value;
     var mapping;
     var direction;
@@ -128,6 +129,11 @@ function multislider(elem, config) {
         multisliderHeight = parseFloat(style.height.match(pxRegex)[1]);
     }
 
+    multislider.setMultiSliderTracking = function (val) {
+        multiSliderTracking = val;
+    }
+
+    
     function setSliderWidthVal () {
         multisliderWidth = parseFloat(style.width.match(pxRegex)[1]);
     }
@@ -194,10 +200,11 @@ function multislider(elem, config) {
     var moved = false;
     var lastIdx = false;
     var lastFraction = false;
+    var idxFraction = 0;
     
     function mouseDownListener (event) {
         moved = false;
-        let idxFraction = getIdxFraction(event);
+        idxFraction = getIdxFraction(event);
         let valFraction = getFraction(event);
         idx = Math.floor(idxFraction*numSliders);
         if (idx >= numSliders) idx = numSliders - 1;
@@ -231,7 +238,9 @@ function multislider(elem, config) {
     function mouseMoveListener (event) {
         moved = true;
         let valFraction = getFraction(event);
-        let idxFraction = getIdxFraction(event);
+        if (multiSliderTracking != 0) {
+            idxFraction = getIdxFraction(event);
+        }
         idx = Math.floor(idxFraction*numSliders);
         if (idx >= numSliders) idx = numSliders - 1;
         if ((idx != lastIdx) || (valFraction != lastFraction)) {
