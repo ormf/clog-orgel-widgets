@@ -238,7 +238,7 @@ function multislider(elem, config) {
     function mouseMoveListener (event) {
         moved = true;
         let valFraction = getFraction(event);
-        if (multiSliderTracking != 0) {
+        if (sliderConstrained == 0) {
             idxFraction = getIdxFraction(event);
         }
         idx = Math.floor(idxFraction*numSliders);

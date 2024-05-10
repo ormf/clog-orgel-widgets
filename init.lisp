@@ -28,5 +28,6 @@
   (load-script (html-document body) "js/multislider.js")
   (load-script (html-document body) "js/numbox.js")
   (load-script (html-document body) "js/bang.js")
+  (load-script (html-document body) "js/general.js")
   (load-css (html-document body) "/css/w3.css")
   (load-css (html-document body) "./css/custom-gui-elems.css"))
